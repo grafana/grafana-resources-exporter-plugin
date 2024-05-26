@@ -8,6 +8,15 @@ App plugins can let you create a custom out-of-the-box monitoring experience by 
 
 ## Get started
 
+### TL;DR
+
+```bash
+$ npm install
+$ npm run dev # watches and rebuilds the frontend
+$ npm run server # starts a Grafana instance in docker, with the plugin enabled
+```
+
+
 ### Backend
 
 1. Update [Grafana plugin SDK for Go](https://grafana.com/developers/plugin-tools/introduction/grafana-plugin-sdk-for-go) dependency to the latest minor version:

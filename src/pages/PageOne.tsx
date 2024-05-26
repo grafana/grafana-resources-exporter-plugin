@@ -13,7 +13,7 @@ export function PageOne() {
   return (
     <PluginPage>
       <div data-testid={testIds.pageOne.container}>
-        This is page one.
+        This is page one!
         <div className={s.marginTop}>
           <LinkButton data-testid={testIds.pageOne.navigateToFour} href={prefixRoute(ROUTES.Four)}>
             Full-width page example
