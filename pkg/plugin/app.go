@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -19,14 +20,51 @@ var (
 	_ backend.CheckHealthHandler    = (*App)(nil)
 )
 
+type JSONData struct {
+	GrafanaURL string `json:"grafanaUrl"`
+}
+
+type EncodedSecureJSONData struct {
+	ServiceAccountToken string `json:"serviceAccountToken"`
+}
+
+type Config struct {
+	JSONData       JSONData              `json:"jsonData"`
+	SecureJSONData EncodedSecureJSONData `json:"secureJsonData"`
+}
+
+func (config *Config) FromAppInstanceSettings(settings backend.AppInstanceSettings) error {
+	if settings.JSONData != nil {
+		if err := json.Unmarshal(settings.JSONData, &config.JSONData); err != nil {
+			return err
+		}
+	}
+
+	if settings.DecryptedSecureJSONData != nil {
+		if saToken, ok := settings.DecryptedSecureJSONData["serviceAccountToken"]; ok {
+			config.SecureJSONData.ServiceAccountToken = saToken
+		}
+	}
+
+	return nil
+}
+
 // App is an example app backend plugin which can respond to data queries.
 type App struct {
 	backend.CallResourceHandler
+
+	Config *Config
 }
 
 // NewApp creates a new example *App instance.
 func NewApp(_ context.Context, appInstanceSettings backend.AppInstanceSettings) (instancemgmt.Instance, error) {
-	var app App
+	app := App{
+		Config: &Config{},
+	}
+
+	if err := app.Config.FromAppInstanceSettings(appInstanceSettings); err != nil {
+		return nil, err
+	}
 
 	// Use a httpadapter (provided by the SDK) for resource calls. This allows us
 	// to use a *http.ServeMux for resource calls, so we can map multiple routes

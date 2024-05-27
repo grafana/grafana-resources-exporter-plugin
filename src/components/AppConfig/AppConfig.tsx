@@ -7,16 +7,15 @@ import { Button, Field, FieldSet, Input, SecretInput, useStyles2 } from '@grafan
 import { testIds } from '../testIds';
 
 export type AppPluginSettings = {
-  apiUrl?: string;
+  grafanaUrl?: string;
+  serviceAccountToken?: string;
 };
 
 type State = {
-  // The URL to reach our custom API.
-  apiUrl: string;
-  // Tells us if the API key secret is set.
-  isApiKeySet: boolean;
-  // A secret key for our custom API.
-  apiKey: string;
+  grafanaUrl: string;
+  serviceAccountToken: string;
+
+  isServiceAccountTokenSet: boolean;
 };
 
 export interface AppConfigProps extends PluginConfigPageProps<AppPluginMeta<AppPluginSettings>> {}
@@ -25,16 +24,16 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
   const s = useStyles2(getStyles);
   const { enabled, pinned, jsonData, secureJsonFields } = plugin.meta;
   const [state, setState] = useState<State>({
-    apiUrl: jsonData?.apiUrl || '',
-    apiKey: '',
-    isApiKeySet: Boolean(secureJsonFields?.apiKey),
+    grafanaUrl: jsonData?.grafanaUrl || '',
+    serviceAccountToken: '',
+    isServiceAccountTokenSet: Boolean(secureJsonFields?.serviceAccountToken),
   });
 
   const onResetApiKey = () =>
     setState({
       ...state,
-      apiKey: '',
-      isApiKeySet: false,
+      serviceAccountToken: '',
+      isServiceAccountTokenSet: false,
     });
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -47,29 +46,29 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
   return (
     <div data-testid={testIds.appConfig.container}>
       <FieldSet label="API Settings">
-        <Field label="API Key" description="A secret key for authenticating to our custom API">
-          <SecretInput
-            width={60}
-            id="config-api-key"
-            data-testid={testIds.appConfig.apiKey}
-            name="apiKey"
-            value={state.apiKey}
-            isConfigured={state.isApiKeySet}
-            placeholder={'Your secret API key'}
-            onChange={onChange}
-            onReset={onResetApiKey}
+        <Field label="Grafana Url" description="" className={s.marginTop}>
+          <Input
+              width={60}
+              name="grafanaUrl"
+              id="config-api-url"
+              data-testid={testIds.appConfig.grafanaUrl}
+              value={state.grafanaUrl}
+              placeholder={`E.g.: https://my-grafana-instance.com`}
+              onChange={onChange}
           />
         </Field>
 
-        <Field label="API Url" description="" className={s.marginTop}>
-          <Input
+        <Field label="Service Account Token" description="A service account token.">
+          <SecretInput
             width={60}
-            name="apiUrl"
-            id="config-api-url"
-            data-testid={testIds.appConfig.apiUrl}
-            value={state.apiUrl}
-            placeholder={`E.g.: http://mywebsite.com/api/v1`}
+            id="config-service-account-token"
+            data-testid={testIds.appConfig.serviceAccountToken}
+            name="serviceAccountToken"
+            value={state.serviceAccountToken}
+            isConfigured={state.isServiceAccountTokenSet}
+            placeholder={'Your service account token'}
             onChange={onChange}
+            onReset={onResetApiKey}
           />
         </Field>
 
@@ -82,18 +81,18 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
                 enabled,
                 pinned,
                 jsonData: {
-                  apiUrl: state.apiUrl,
+                  grafanaUrl: state.grafanaUrl,
                 },
                 // This cannot be queried later by the frontend.
                 // We don't want to override it in case it was set previously and left untouched now.
-                secureJsonData: state.isApiKeySet
+                secureJsonData: state.isServiceAccountTokenSet
                   ? undefined
                   : {
-                      apiKey: state.apiKey,
+                      serviceAccountToken: state.serviceAccountToken,
                     },
               })
             }
-            disabled={Boolean(!state.apiUrl || (!state.isApiKeySet && !state.apiKey))}
+            disabled={Boolean(!state.grafanaUrl || (!state.isServiceAccountTokenSet && !state.serviceAccountToken))}
           >
             Save API settings
           </Button>

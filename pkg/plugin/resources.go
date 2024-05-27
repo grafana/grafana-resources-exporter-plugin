@@ -64,8 +64,8 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 		Format:          body.OutputFormat,
 		ProviderVersion: "v3.0.0", // TODO(kgz): can we get that from the tf provider itself?
 		Grafana: &tfgenerate.GrafanaConfig{
-			URL:  "http://127.0.0.1:3000", // TODO(kgz)
-			Auth: "",                      // TODO(kgz)
+			URL:  a.Config.JSONData.GrafanaURL,
+			Auth: a.Config.SecureJSONData.ServiceAccountToken,
 		},
 		//Cloud: &tfgenerate.CloudConfig{},
 	}

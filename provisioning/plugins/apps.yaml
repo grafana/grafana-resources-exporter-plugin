@@ -6,6 +6,4 @@ apps:
     org_name: 'grafana'
     disabled: false
     jsonData:
-      apiUrl: http://default-url.com
-    secureJsonData:
-      apiKey: secret-key
+      grafanaUrl: http://localhost:3000
