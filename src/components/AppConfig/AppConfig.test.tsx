@@ -24,15 +24,15 @@ describe('Components/AppConfig', () => {
     } as unknown as AppConfigProps;
   });
 
-  test('renders the "API Settings" fieldset with API key, API url inputs and button', () => {
+  test('renders the "API Settings" fieldset with ServiceAccount token, Grafana url inputs and button', () => {
     const plugin = { meta: { ...props.plugin.meta, enabled: false } };
 
     // @ts-ignore - We don't need to provide `addConfigPage()` and `setChannelSupport()` for these tests
     render(<AppConfig plugin={plugin} query={props.query} />);
 
     expect(screen.queryByRole('group', { name: /api settings/i })).toBeInTheDocument();
-    expect(screen.queryByTestId(testIds.appConfig.apiKey)).toBeInTheDocument();
-    expect(screen.queryByTestId(testIds.appConfig.apiUrl)).toBeInTheDocument();
+    expect(screen.queryByTestId(testIds.appConfig.grafanaUrl)).toBeInTheDocument();
+    expect(screen.queryByTestId(testIds.appConfig.serviceAccountToken)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /save api settings/i })).toBeInTheDocument();
   });
 });
