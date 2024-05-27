@@ -1,10 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
   "type": "app",
-  "name": "Grafana-as-Code",
-  "id": "grafana-grafanaascode-app",
+  "name": "grafana-cat-plugin",
+  "id": "grafana-catplugin-app",
   "backend": true,
-  "executable": "gpx_grafana_as_code",
+  "executable": "gpx_grafana_cat_plugin",
   "info": {
     "keywords": ["app"],
     "description": "",
