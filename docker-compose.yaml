@@ -7,8 +7,8 @@ services:
     build:
       context: ./.config
       args:
-        grafana_image: ${GRAFANA_IMAGE:-grafana-enterprise}
-        grafana_version: ${GRAFANA_VERSION:-10.3.3}
+        grafana_image: ${GRAFANA_IMAGE:-grafana}
+        grafana_version: ${GRAFANA_VERSION:-11.0.0}
         development: ${DEVELOPMENT:-false}
     ports:
       - 3000:3000/tcp
@@ -24,8 +24,10 @@ services:
       - .:/root/grafana-grafanaascode-app
 
     environment:
+      DEVELOPMENT: true
       NODE_ENV: development
       GF_LOG_FILTERS: plugin.grafana-grafanaascode-app:debug
       GF_LOG_LEVEL: debug
       GF_DATAPROXY_LOGGING: 1
       GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: grafana-grafanaascode-app
+      GF_AUTH_ANONYMOUS_ENABLED: false

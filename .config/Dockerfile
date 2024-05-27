@@ -8,6 +8,8 @@ ARG development=false
 ARG GO_VERSION=1.21.6
 ARG GO_ARCH=amd64
 
+ARG TF_VERSION=1.8.4
+
 ENV DEV "${development}"
 
 # Make it as simple as possible to access the grafana instance for development purposes
@@ -65,6 +67,15 @@ RUN if [ "${development}" = "true" ]; then \
     export PATH=$PATH:/usr/local/go/bin; \
     go run bootstrap.go; \
     fi
+
+# Install terraform binary
+# TODO(kgz): will not work for every possible image build
+RUN DEBIAN_FRONTEND=noninteractive && \
+      apk add wget unzip && \
+      wget --quiet https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_${GO_ARCH}.zip && \
+      unzip terraform_${TF_VERSION}_linux_${GO_ARCH}.zip && \
+      mv terraform /usr/bin && \
+      rm terraform_${TF_VERSION}_linux_${GO_ARCH}.zip
 
 # Inject livereload script into grafana index.html
 RUN sed -i 's|</body>|<script src="http://localhost:35729/livereload.js"></script></body>|g' /usr/share/grafana/public/views/index.html
