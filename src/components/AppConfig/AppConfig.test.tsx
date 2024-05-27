@@ -24,7 +24,7 @@ describe('Components/AppConfig', () => {
     } as unknown as AppConfigProps;
   });
 
-  test('renders the "API Settings" fieldset with SA token, Grafana url inputs and button', () => {
+  test('renders the "API Settings" fieldset with ServiceAccount token, Grafana url inputs and button', () => {
     const plugin = { meta: { ...props.plugin.meta, enabled: false } };
 
     // @ts-ignore - We don't need to provide `addConfigPage()` and `setChannelSupport()` for these tests
