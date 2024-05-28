@@ -6,7 +6,7 @@ toolchain go1.22.3
 
 require (
 	github.com/grafana/grafana-plugin-sdk-go v0.232.0
-	github.com/grafana/terraform-provider-grafana/v2 v2.19.1-0.20240527011801-89caddb3184e
+	github.com/grafana/terraform-provider-grafana/v3 v3.0.1-0.20240527172558-b88a3d639696
 )
 
 require (

@@ -9,12 +9,14 @@ import (
 	"strings"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
-	tfgenerate "github.com/grafana/terraform-provider-grafana/v2/pkg/generate"
+	tfgenerate "github.com/grafana/terraform-provider-grafana/v3/pkg/generate"
+	tfprovider "github.com/grafana/terraform-provider-grafana/v3/pkg/provider"
 )
 
 // registerRoutes takes a *http.ServeMux and registers some HTTP handlers.
 func (a *App) registerRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/generate", a.handleGenerate)
+	mux.HandleFunc("/resource-types", a.handleResourceTypes)
 }
 
 type generateRequest struct {
@@ -85,6 +87,42 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 
 	resp := generateResponse{
 		Files: directoryContent,
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		log.DefaultLogger.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+type resource struct {
+	Name      string `json:"name"`
+	HasLister bool   `json:"hasLister"`
+}
+
+type resourceTypesResponse struct {
+	Resources []resource `json:"resources"`
+}
+
+func (a *App) handleResourceTypes(w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var resources []resource
+	for _, r := range tfprovider.Resources() {
+		resources = append(resources, resource{
+			Name:      r.Name,
+			HasLister: r.ListIDsFunc != nil,
+		})
+	}
+
+	resp := resourceTypesResponse{
+		Resources: resources,
 	}
 
 	w.Header().Add("Content-Type", "application/json")
