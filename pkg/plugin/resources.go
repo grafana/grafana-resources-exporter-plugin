@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
-	tfgenerate "github.com/grafana/terraform-provider-grafana/v2/pkg/generate"
-	tfprovider "github.com/grafana/terraform-provider-grafana/v2/pkg/provider"
+	tfgenerate "github.com/grafana/terraform-provider-grafana/v3/pkg/generate"
+	tfprovider "github.com/grafana/terraform-provider-grafana/v3/pkg/provider"
 )
 
 // registerRoutes takes a *http.ServeMux and registers some HTTP handlers.
