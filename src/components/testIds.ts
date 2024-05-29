@@ -19,4 +19,7 @@ export const testIds = {
     container: 'data-testid pg-four-container',
     navigateBack: 'data-testid navigate-back',
   },
+  exportPage: {
+    container: 'data-testid pg-export-container'
+  }
 };
