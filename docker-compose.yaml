@@ -1,7 +1,7 @@
 services:
   grafana:
     user: root
-    container_name: 'grafana-grafanaascode-app'
+    container_name: 'grafana-catplugin-app'
 
     platform: 'linux/amd64'
     build:
@@ -19,15 +19,15 @@ services:
     cap_add:
       - SYS_PTRACE
     volumes:
-      - ./dist:/var/lib/grafana/plugins/grafana-grafanaascode-app
+      - ./dist:/var/lib/grafana/plugins/grafana-catplugin-app
       - ./provisioning:/etc/grafana/provisioning
-      - .:/root/grafana-grafanaascode-app
+      - .:/root/grafana-catplugin-app
 
     environment:
-      DEVELOPMENT: true
+      DEVELOPMENT: "true"
       NODE_ENV: development
       GF_LOG_FILTERS: plugin.grafana-grafanaascode-app:debug
       GF_LOG_LEVEL: debug
       GF_DATAPROXY_LOGGING: 1
-      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: grafana-grafanaascode-app
-      GF_AUTH_ANONYMOUS_ENABLED: false
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: grafana-catplugin-app
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
