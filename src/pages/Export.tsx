@@ -3,16 +3,24 @@ import { useAsync } from "react-use";
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import { PluginPage, getBackendSrv } from '@grafana/runtime';
-import { TextArea, useStyles2, ErrorWithStack, Spinner } from '@grafana/ui';
+import { TextArea, useStyles2, ErrorWithStack, Spinner, CodeEditor } from '@grafana/ui';
 import { testIds } from '../components/testIds';
 import pluginJson from '../plugin.json';
 
-const FileViewer = (props: {filename: string, content: string}) => {
+const FileViewer = (props: {filename: string, content: string, format: string}) => {
   const s = useStyles2(getStyles);
   return (
     <>
       <h2>{props.filename}</h2>
-      <TextArea className={s.textArea}>{props.content}</TextArea>
+      <CodeEditor
+        width="100%"
+        height="200px"
+        value={props.content}
+        language={props.format}
+        showLineNumbers={true}
+        showMiniMap={true}
+        readOnly={true}
+      />
     </>
   );
 }
@@ -42,7 +50,7 @@ const FileViewerList = () => {
 
   return (
     <>
-      {state.value!.files.map((file, i) => (<FileViewer key={i} filename={file.name} content={file.content} />))}
+      {state.value!.files.map((file, i) => (<FileViewer key={i} filename={file.name} content={file.content} format="hcl"/>))}
     </>
   );
 }
