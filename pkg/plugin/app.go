@@ -7,6 +7,7 @@ import (
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 )
 
@@ -53,16 +54,18 @@ func (config *Config) FromAppInstanceSettings(settings backend.AppInstanceSettin
 type App struct {
 	backend.CallResourceHandler
 
-	Config *Config
+	config *Config
+	logger log.Logger
 }
 
 // NewApp creates a new example *App instance.
 func NewApp(_ context.Context, appInstanceSettings backend.AppInstanceSettings) (instancemgmt.Instance, error) {
 	app := App{
-		Config: &Config{},
+		config: &Config{},
+		logger: log.New(),
 	}
 
-	if err := app.Config.FromAppInstanceSettings(appInstanceSettings); err != nil {
+	if err := app.config.FromAppInstanceSettings(appInstanceSettings); err != nil {
 		return nil, err
 	}
 

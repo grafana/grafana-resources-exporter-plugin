@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	tfgenerate "github.com/grafana/terraform-provider-grafana/v3/pkg/generate"
 	tfprovider "github.com/grafana/terraform-provider-grafana/v3/pkg/provider"
 )
@@ -42,21 +41,21 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 
 	var body generateRequest
 	if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-		log.DefaultLogger.Error(err.Error())
+		a.logger.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	tmpDir, err := os.MkdirTemp("", "tf-generate-")
 	if err != nil {
-		log.DefaultLogger.Error(err.Error())
+		a.logger.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer func() {
-		log.DefaultLogger.Debug("deleting tf-generate tmp directory")
+		a.logger.Debug("deleting tf-generate tmp directory")
 		if err := os.RemoveAll(tmpDir); err != nil {
-			log.DefaultLogger.Error(err.Error())
+			a.logger.Error(err.Error())
 		}
 	}()
 
@@ -66,21 +65,21 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 		Format:          body.OutputFormat,
 		ProviderVersion: "v3.0.0", // TODO(kgz): can we get that from the tf provider itself?
 		Grafana: &tfgenerate.GrafanaConfig{
-			URL:  a.Config.JSONData.GrafanaURL,
-			Auth: a.Config.SecureJSONData.ServiceAccountToken,
+			URL:  a.config.JSONData.GrafanaURL,
+			Auth: a.config.SecureJSONData.ServiceAccountToken,
 		},
-		//Cloud: &tfgenerate.CloudConfig{},
+		// Cloud: &tfgenerate.CloudConfig{},
 	}
 
 	if err := tfgenerate.Generate(req.Context(), genConfig); err != nil {
-		log.DefaultLogger.Error(err.Error())
+		a.logger.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	directoryContent, err := directoryToMap(tmpDir)
+	directoryContent, err := a.directoryToMap(tmpDir)
 	if err != nil {
-		log.DefaultLogger.Error(err.Error())
+		a.logger.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -91,7 +90,7 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Add("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		log.DefaultLogger.Error(err.Error())
+		a.logger.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -127,14 +126,14 @@ func (a *App) handleResourceTypes(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Add("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		log.DefaultLogger.Error(err.Error())
+		a.logger.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 }
 
-func directoryToMap(directory string) (map[string]string, error) {
+func (a *App) directoryToMap(directory string) (map[string]string, error) {
 	files := make(map[string]string)
 	err := filepath.Walk(directory, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
@@ -156,7 +155,7 @@ func directoryToMap(directory string) (map[string]string, error) {
 			return err
 		}
 
-		log.DefaultLogger.Info(info.Name(), filename)
+		a.logger.Info(info.Name(), filename)
 
 		files[info.Name()] = string(content)
 
