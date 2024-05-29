@@ -24,8 +24,13 @@ type generateRequest struct {
 	Cloud        *tfgenerate.CloudConfig   `json:"cloud"`
 }
 
+type generatedFile struct {
+	Name    string `json:"name"`
+	Content string `json:"content"`
+}
+
 type generateResponse struct {
-	Files map[string]string `json:"files"`
+	Files []generatedFile `json:"files"`
 }
 
 func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
@@ -77,7 +82,7 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	directoryContent, err := a.directoryToMap(tmpDir)
+	files, err := a.directoryToGeneratedFiles(tmpDir)
 	if err != nil {
 		a.logger.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -85,7 +90,7 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 	}
 
 	resp := generateResponse{
-		Files: directoryContent,
+		Files: files,
 	}
 
 	w.Header().Add("Content-Type", "application/json")
@@ -133,8 +138,8 @@ func (a *App) handleResourceTypes(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (a *App) directoryToMap(directory string) (map[string]string, error) {
-	files := make(map[string]string)
+func (a *App) directoryToGeneratedFiles(directory string) ([]generatedFile, error) {
+	var files []generatedFile
 	err := filepath.Walk(directory, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -157,7 +162,10 @@ func (a *App) directoryToMap(directory string) (map[string]string, error) {
 
 		a.logger.Info(info.Name(), filename)
 
-		files[info.Name()] = string(content)
+		files = append(files, generatedFile{
+			Name:    info.Name(),
+			Content: string(content),
+		})
 
 		return nil
 	})
