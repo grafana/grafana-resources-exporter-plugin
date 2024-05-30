@@ -1,11 +1,16 @@
 import React from 'react';
-import { useAsync } from "react-use";
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
-import { PluginPage, getBackendSrv } from '@grafana/runtime';
-import { useStyles2, ErrorWithStack, Spinner, CodeEditor } from '@grafana/ui';
+import { PluginPage } from '@grafana/runtime';
+import {useStyles2, ErrorWithStack, Spinner, CodeEditor, RadioButtonGroup} from '@grafana/ui';
 import { testIds } from '../components/testIds';
-import pluginJson from '../plugin.json';
+import {useGeneratedFiles} from "../hooks/useGeneratedFiles";
+import {GeneratedFile} from "../types/generator";
+
+const outputFormatOptions = [
+  {label: 'HCL', value: 'hcl'},
+  {label: 'JSON', value: 'json'},
+];
 
 const FileViewer = (props: {filename: string, content: string, format: string}) => {
   return (
@@ -24,46 +29,40 @@ const FileViewer = (props: {filename: string, content: string, format: string}) 
   );
 }
 
-interface GeneratedFile {
-  name: string;
-  content: string
-}
-
-interface BackendResponse {
-  files: GeneratedFile[];
-}
-
-const FileViewerList = () => {
-  const outputFormat = "hcl";
-  const state = useAsync(async () => {
-    return await getBackendSrv().post<BackendResponse>(`api/plugins/${pluginJson.id}/resources/generate`, {
-      outputFormat: outputFormat,
-    });
-  });
-
-  if (state.error) {
-    return <ErrorWithStack error={state.error} title={'Unexpected error'} errorInfo={null} />;
-  }
-  if (state.loading) {
-    return <Spinner />;
-  }
-
+const FileViewerList = ({files, format}: {files: GeneratedFile[], format: string}) => {
   return (
     <>
-      {state.value!.files.map((file, i) => (<FileViewer key={i} filename={file.name} content={file.content} format={outputFormat} />))}
+      {files.map((file, i) => (<FileViewer key={i} filename={file.name} content={file.content} format={format} />))}
     </>
   );
 }
 
 export function ExportPage() {
   const s = useStyles2(getStyles);
+  let content: React.ReactNode;
+
+  const {files, format, setFormat, loading, error} = useGeneratedFiles();
+
+  if (error) {
+    content = <ErrorWithStack error={error} title={'Unexpected error'} errorInfo={null} />;
+  } else if (loading) {
+    content = <Spinner />;
+  } else {
+    content = (
+      <div className={s.marginTop}>
+        <FileViewerList files={files!} format={format} />
+      </div>
+    );
+  }
+
   return (
     <PluginPage>
       <div data-testid={testIds.exportPage.container}>
-        WELCOME TO EXPORT PAGE.
-        <div className={s.marginTop}>
-          <FileViewerList/>
+        <div>
+          <RadioButtonGroup options={outputFormatOptions} value={format} onChange={v => setFormat(v!)} size="md" />
         </div>
+
+        {content}
       </div>
     </PluginPage>
   );
