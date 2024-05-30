@@ -3,12 +3,11 @@ import { useAsync } from "react-use";
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import { PluginPage, getBackendSrv } from '@grafana/runtime';
-import { TextArea, useStyles2, ErrorWithStack, Spinner, CodeEditor } from '@grafana/ui';
+import { useStyles2, ErrorWithStack, Spinner, CodeEditor } from '@grafana/ui';
 import { testIds } from '../components/testIds';
 import pluginJson from '../plugin.json';
 
 const FileViewer = (props: {filename: string, content: string, format: string}) => {
-  const s = useStyles2(getStyles);
   return (
     <>
       <h2>{props.filename}</h2>
@@ -35,9 +34,10 @@ interface BackendResponse {
 }
 
 const FileViewerList = () => {
+  const outputFormat = "hcl";
   const state = useAsync(async () => {
     return await getBackendSrv().post<BackendResponse>(`api/plugins/${pluginJson.id}/resources/generate`, {
-      outputFormat: "hcl",
+      outputFormat: outputFormat,
     });
   });
 
@@ -50,7 +50,7 @@ const FileViewerList = () => {
 
   return (
     <>
-      {state.value!.files.map((file, i) => (<FileViewer key={i} filename={file.name} content={file.content} format="hcl"/>))}
+      {state.value!.files.map((file, i) => (<FileViewer key={i} filename={file.name} content={file.content} format={outputFormat} />))}
     </>
   );
 }
@@ -73,8 +73,4 @@ const getStyles = (theme: GrafanaTheme2) => ({
   marginTop: css`
     margin-top: ${theme.spacing(2)};
   `,
-  textArea: css`
-    font-family: monospace, monospace;
-    height: 200px;
-  `
 });

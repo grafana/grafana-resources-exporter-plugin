@@ -19,9 +19,12 @@ func (a *App) registerRoutes(mux *http.ServeMux) {
 }
 
 type generateRequest struct {
-	OutputFormat tfgenerate.OutputFormat   `json:"outputFormat"`
-	Grafana      *tfgenerate.GrafanaConfig `json:"grafana"`
-	Cloud        *tfgenerate.CloudConfig   `json:"cloud"`
+	OutputFormat tfgenerate.OutputFormat `json:"outputFormat"`
+
+	// OnlyResources is a list of patterns to filter resources by.
+	// If a resource name matches any of the patterns, it will be included in the output.
+	// Patterns are in the form of `resourceType.resourceName` and support * as a wildcard.
+	OnlyResources []string `json:"onlyResources"`
 }
 
 type generatedFile struct {
@@ -65,10 +68,11 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 	}()
 
 	genConfig := &tfgenerate.Config{
-		OutputDir:       tmpDir,
-		Clobber:         true,
-		Format:          body.OutputFormat,
-		ProviderVersion: "v3.0.0", // TODO(kgz): can we get that from the tf provider itself?
+		OutputDir:        tmpDir,
+		Clobber:          true,
+		ProviderVersion:  "v3.0.0", // TODO(kgz): can we get that from the tf provider itself?
+		Format:           body.OutputFormat,
+		IncludeResources: body.OnlyResources,
 		Grafana: &tfgenerate.GrafanaConfig{
 			URL:  a.config.JSONData.GrafanaURL,
 			Auth: a.config.SecureJSONData.ServiceAccountToken,

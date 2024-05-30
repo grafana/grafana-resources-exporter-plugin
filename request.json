@@ -1,3 +1,6 @@
 {
-  "outputFormat": "hcl"
+  "outputFormat": "hcl",
+  "onlyResources": [
+    "grafana_folder.*"
+  ]
 }
