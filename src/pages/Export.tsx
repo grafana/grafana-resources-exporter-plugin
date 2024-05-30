@@ -49,6 +49,10 @@ export function ExportPage() {
     content = <ErrorWithStack error={error} title={'Unexpected error'} errorInfo={null} />;
   } else if (loading) {
     content = <Spinner />;
+  } else if (files?.length === 0) {
+    content = <div className={s.marginTop}>
+      This is where stuff happens.
+    </div>
   } else {
     content = (
       <div className={s.marginTop}>
@@ -57,6 +61,9 @@ export function ExportPage() {
     );
   }
 
+  const generate = () => {
+    // not implemented yet
+  }
   const download = () => {
     if (!files || files.length === 0) {
       return;
@@ -78,6 +85,7 @@ export function ExportPage() {
       <div data-testid={testIds.exportPage.container}>
         <div>
           <RadioButtonGroup options={outputFormatOptions} value={format} onChange={v => setFormat(v!)} size="md" />
+          <Button icon="arrow-to-right" onClick={_ => generate()}>Generate</Button>
 
           <Button icon="file-download" disabled={Boolean(error || loading)} onClick={_ => download()}>Download as zip</Button>
         </div>
