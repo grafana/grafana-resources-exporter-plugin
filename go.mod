@@ -4,13 +4,17 @@ go 1.22
 
 toolchain go1.22.3
 
+// see https://github.com/grafana/terraform-provider-grafana/pull/1592#discussion_r1618609696
+replace github.com/hashicorp/terraform-exec v0.21.0 => github.com/hrmsk66/terraform-exec v0.21.0
+
 require (
 	github.com/grafana/grafana-plugin-sdk-go v0.232.0
-	github.com/grafana/terraform-provider-grafana/v3 v3.0.1-0.20240527172558-b88a3d639696
+	github.com/grafana/terraform-provider-grafana/v3 v3.0.1-0.20240529165127-d58abb49af00
 )
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
+	github.com/ProtonMail/go-crypto v1.1.0-alpha.2 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apache/arrow/go/v15 v15.0.2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
@@ -20,6 +24,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cheekybits/genny v1.0.0 // indirect
 	github.com/chromedp/cdproto v0.0.0-20220208224320-6efb837e6bc2 // indirect
+	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
 	github.com/elazarl/goproxy v0.0.0-20230731152917-f99041a5c027 // indirect
 	github.com/fatih/color v1.17.0 // indirect
@@ -61,8 +66,11 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.6 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
+	github.com/hashicorp/hc-install v0.6.4 // indirect
 	github.com/hashicorp/hcl/v2 v2.20.1 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
+	github.com/hashicorp/terraform-exec v0.21.0 // indirect
+	github.com/hashicorp/terraform-json v0.22.1 // indirect
 	github.com/hashicorp/terraform-plugin-framework v1.8.0 // indirect
 	github.com/hashicorp/terraform-plugin-framework-validators v0.12.0 // indirect
 	github.com/hashicorp/terraform-plugin-go v0.23.0 // indirect
@@ -124,6 +132,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.26.0 // indirect
 	go.opentelemetry.io/otel/trace v1.26.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.2.0 // indirect
+	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a // indirect
 	golang.org/x/mod v0.16.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
