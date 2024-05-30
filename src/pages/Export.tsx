@@ -2,10 +2,12 @@ import React from 'react';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import { PluginPage } from '@grafana/runtime';
-import {useStyles2, ErrorWithStack, Spinner, CodeEditor, RadioButtonGroup} from '@grafana/ui';
+import {useStyles2, ErrorWithStack, Spinner, CodeEditor, RadioButtonGroup, Button} from '@grafana/ui';
 import { testIds } from '../components/testIds';
 import {useGeneratedFiles} from "../hooks/useGeneratedFiles";
 import {GeneratedFile} from "../types/generator";
+import { saveAs } from 'file-saver';
+import JSZip from "jszip";
 
 const outputFormatOptions = [
   {label: 'HCL', value: 'hcl'},
@@ -55,11 +57,29 @@ export function ExportPage() {
     );
   }
 
+  const download = () => {
+    if (!files || files.length === 0) {
+      return;
+    }
+
+    const archive = new JSZip();
+
+    files!.forEach(file => {
+      archive.file(file.name, file.content);
+    })
+
+    archive.generateAsync({type:"blob"}).then(function(content) {
+      saveAs(content, "grafana-terraform-export.zip");
+    });
+  };
+
   return (
     <PluginPage>
       <div data-testid={testIds.exportPage.container}>
         <div>
           <RadioButtonGroup options={outputFormatOptions} value={format} onChange={v => setFormat(v!)} size="md" />
+
+          <Button icon="file-download" disabled={Boolean(error || loading)} onClick={_ => download()}>Download as zip</Button>
         </div>
 
         {content}
