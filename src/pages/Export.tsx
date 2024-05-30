@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import { PluginPage, getBackendSrv } from '@grafana/runtime';
-import {useStyles2, ErrorWithStack, Spinner, CodeEditor, RadioButtonGroup, Button} from '@grafana/ui';
+import {useStyles2, ErrorWithStack, Spinner, CodeEditor, RadioButtonGroup, Button, TabsBar, Tab, TabContent} from '@grafana/ui';
 import { testIds } from '../components/testIds';
 import {GeneratedFile, GenerateResponse} from "../types/generator";
 import { saveAs } from 'file-saver';
@@ -12,32 +12,9 @@ import pluginJson from '../plugin.json'
 const outputFormatOptions = [
   {label: 'HCL', value: 'hcl'},
   {label: 'JSON', value: 'json'},
+  {label: 'Crossplane', value: 'crossplane'}
 ];
-
-const FileViewer = (props: {filename: string, content: string, format: string}) => {
-  return (
-    <>
-      <h2>{props.filename}</h2>
-      <CodeEditor
-        width="100%"
-        height="200px"
-        value={props.content}
-        language={props.format}
-        showLineNumbers={true}
-        showMiniMap={true}
-        readOnly={true}
-      />
-    </>
-  );
-}
-
-const FileViewerList = ({files, format}: {files: GeneratedFile[], format: string}) => {
-  return (
-    <>
-      {files.map((file, i) => (<FileViewer key={i} filename={file.name} content={file.content} format={format} />))}
-    </>
-  );
-}
+const disabledOutputFormats = ['crossplane']
 
 export function ExportPage() {
   const s = useStyles2(getStyles);
@@ -46,10 +23,8 @@ export function ExportPage() {
   const [loading, setLoading] = useState(false)
   const [format, setFormat] = useState("hcl")
   const [error, setError] = useState<Error | undefined>(undefined)
+  const [activeTab, setActiveTab] = useState(0)
   let content: React.ReactNode;
-
-
-  //const {files, format, setFormat, loading, error} = useGeneratedFiles();
 
   if (error) {
     content = <ErrorWithStack error={error} title={'Unexpected error'} errorInfo={null} />;
@@ -57,12 +32,30 @@ export function ExportPage() {
     content = <Spinner />;
   } else if (files?.length === 0) {
     content = <div className={s.marginTop}>
-      This is where stuff happens.
+      <h1>Render your Grafana resources in Terraform</h1>
+      <p>Resources within Grafana can be represented in other formats.</p>
+      <p>Use the `Generate` button above to render all Grafana resources as Terraform files.
+         You have a choice of HCL and JSON formats (with Crossplane and others coming).</p>
+      <p>Once you have generated your resources, you can download them all as a zip file.</p>
     </div>
   } else {
+    let fileContent = files[activeTab].content
     content = (
       <div className={s.marginTop}>
-        <FileViewerList files={files!} format={format} />
+        <TabsBar>
+        {files.map((file, i) => (<Tab key={i} active={i === activeTab} label={file.name} onChangeTab={_=>{setActiveTab(i)}}/>))}
+        </TabsBar>
+        <TabContent>
+           <CodeEditor
+            width="100%"
+            height="500px"
+            value={fileContent}
+            language="hcl"
+            showLineNumbers={true}
+            showMiniMap={true}
+            readOnly={true}
+          />
+        </TabContent>
       </div>
     );
   }
@@ -104,10 +97,10 @@ export function ExportPage() {
     <PluginPage>
       <div data-testid={testIds.exportPage.container}>
         <div>
-          <RadioButtonGroup options={outputFormatOptions} value={format} onChange={v => setFormat(v!)} size="md" />
-          <Button icon="arrow-to-right" onClick={_ => generate()}>Generate</Button>
+          <RadioButtonGroup options={outputFormatOptions} disabledOptions={disabledOutputFormats} value={format} onChange={v => setFormat(v!)} size="md" />
+          <Button className={s.marginLeft} icon="arrow-to-right" onClick={_ => generate()}>Generate</Button>
 
-          <Button icon="file-download" disabled={Boolean(error || loading)} onClick={_ => download()}>Download as zip</Button>
+          <Button className={s.marginLeft} icon="file-download" disabled={files.length === 0} onClick={_ => download()}>Download as zip</Button>
         </div>
 
         {content}
@@ -119,5 +112,8 @@ export function ExportPage() {
 const getStyles = (theme: GrafanaTheme2) => ({
   marginTop: css`
     margin-top: ${theme.spacing(2)};
+  `,
+  marginLeft: css`
+    margin-left: ${theme.spacing(2)};
   `,
 });
