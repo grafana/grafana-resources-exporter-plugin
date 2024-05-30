@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
-import { PluginPage } from '@grafana/runtime';
+import { PluginPage, getBackendSrv } from '@grafana/runtime';
 import {useStyles2, ErrorWithStack, Spinner, CodeEditor, RadioButtonGroup, Button} from '@grafana/ui';
 import { testIds } from '../components/testIds';
-import {useGeneratedFiles} from "../hooks/useGeneratedFiles";
-import {GeneratedFile} from "../types/generator";
+import {GeneratedFile, GenerateResponse} from "../types/generator";
 import { saveAs } from 'file-saver';
 import JSZip from "jszip";
+import pluginJson from '../plugin.json'
 
 const outputFormatOptions = [
   {label: 'HCL', value: 'hcl'},
@@ -41,9 +41,15 @@ const FileViewerList = ({files, format}: {files: GeneratedFile[], format: string
 
 export function ExportPage() {
   const s = useStyles2(getStyles);
+
+  const [files, setFiles] = useState<GeneratedFile[]>([])
+  const [loading, setLoading] = useState(false)
+  const [format, setFormat] = useState("hcl")
+  const [error, setError] = useState<Error | undefined>(undefined)
   let content: React.ReactNode;
 
-  const {files, format, setFormat, loading, error} = useGeneratedFiles();
+
+  //const {files, format, setFormat, loading, error} = useGeneratedFiles();
 
   if (error) {
     content = <ErrorWithStack error={error} title={'Unexpected error'} errorInfo={null} />;
@@ -61,9 +67,23 @@ export function ExportPage() {
     );
   }
 
-  const generate = () => {
-    // not implemented yet
+  const generate = async() => {
+      setLoading(true)
+      try {
+        const exports = await getBackendSrv().post<GenerateResponse>(`api/plugins/${pluginJson.id}/resources/generate`, {
+          outputFormat: format,
+        });
+        setFiles(exports.files)
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err)
+        } else {
+          setError(new Error(`${err}`))
+        }
+      }
+      setLoading(false)
   }
+
   const download = () => {
     if (!files || files.length === 0) {
       return;
