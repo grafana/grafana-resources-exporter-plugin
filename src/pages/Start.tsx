@@ -19,7 +19,7 @@ export function StartPage() {
           <LinkButton data-testid={testIds.pageOne.navigateToFour} href={prefixRoute(ROUTES.Export)}>
             Generate HCL for this instance
           </LinkButton>
-          <br/>
+          <br />
           <LinkButton data-testid={testIds.pageOne.navigateToFour} href={prefixRoute(ROUTES.Export)}>
             Generate HCL for all stacks
           </LinkButton>
