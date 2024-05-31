@@ -1,5 +1,5 @@
 export interface GeneratedFile {
-    name: string;
+    name: string
     content: string
 }
 
