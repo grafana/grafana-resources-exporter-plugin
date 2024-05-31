@@ -3,11 +3,13 @@ import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import { PluginPage, getBackendSrv } from '@grafana/runtime';
 import {useStyles2, ErrorWithStack, Spinner, CodeEditor, RadioButtonGroup, Button, TabsBar, Tab, TabContent} from '@grafana/ui';
+import { ResourceTypeSelector} from '../components/resourceTypeSelector'
 import { testIds } from '../components/testIds';
 import {GeneratedFile, GenerateResponse} from "../types/generator";
 import { saveAs } from 'file-saver';
 import JSZip from "jszip";
 import pluginJson from '../plugin.json'
+import { getResourceTypes } from '../hooks/resourceTypes'
 
 const outputFormatOptions = [
   {label: 'HCL', value: 'hcl'},
@@ -24,8 +26,13 @@ export function ExportPage() {
   const [format, setFormat] = useState("hcl")
   const [error, setError] = useState<Error | undefined>(undefined)
   const [activeTab, setActiveTab] = useState(0)
+  const [resourceTypes, setResourceTypes] = useState<string[]>([])
   let content: React.ReactNode;
 
+  if (resourceTypes.length === 0) {
+    getResourceTypes(setResourceTypes)
+  }
+  
   if (error) {
     content = <ErrorWithStack error={error} title={'Unexpected error'} errorInfo={null} />;
   } else if (loading) {
@@ -59,12 +66,16 @@ export function ExportPage() {
       </div>
     );
   }
-
   const generate = async() => {
       setLoading(true)
       try {
+        const types: string[] = []
+        resourceTypes.map(t=>{
+          types.push(`${t}.*`)
+        })
         const exports = await getBackendSrv().post<GenerateResponse>(`api/plugins/${pluginJson.id}/resources/generate`, {
           outputFormat: format,
+          onlyResources: types,
         });
         setFiles(exports.files)
       } catch (err) {
@@ -98,6 +109,7 @@ export function ExportPage() {
       <div data-testid={testIds.exportPage.container}>
         <div>
           <RadioButtonGroup options={outputFormatOptions} disabledOptions={disabledOutputFormats} value={format} onChange={v => setFormat(v!)} size="md" />
+          <ResourceTypeSelector className={s.marginLeft} resourceTypes={resourceTypes} onChange={setResourceTypes}/>
           <Button className={s.marginLeft} icon="arrow-to-right" onClick={_ => generate()}>Generate</Button>
 
           <Button className={s.marginLeft} icon="file-download" disabled={files.length === 0} onClick={_ => download()}>Download as zip</Button>
