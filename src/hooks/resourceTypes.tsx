@@ -1,17 +1,19 @@
 
 import { getBackendSrv } from '@grafana/runtime';
 import pluginJson from "../plugin.json"
-import {ResourceTypeResponse} from "../types/resourceTypes";
+import {ResourceType, ResourceTypeResponse} from "../types/resourceTypes";
 
 export const getResourceTypes = async(callback: any) => {
     try {
         const types = await getBackendSrv().get<ResourceTypeResponse>(`api/plugins/${pluginJson.id}/resources/resource-types`)
-        const typeList: string[] = []
+        const typeList: ResourceType[] = []
         types.resources.forEach(type=>{
             if (type.hasLister) {
-                typeList.push(type.name)
+                type.selected = true
+                typeList.push(type)
             }
         })
+        console.log("TYPES", typeList)
         callback(typeList)
     } catch (err) {
         console.log(err)

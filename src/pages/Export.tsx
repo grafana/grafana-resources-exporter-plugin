@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import { PluginPage, getBackendSrv } from '@grafana/runtime';
@@ -10,6 +10,7 @@ import { saveAs } from 'file-saver';
 import JSZip from "jszip";
 import pluginJson from '../plugin.json'
 import { getResourceTypes } from '../hooks/resourceTypes'
+import { ResourceType } from '../types/resourceTypes'
 
 const outputFormatOptions = [
   {label: 'HCL', value: 'hcl'},
@@ -26,12 +27,13 @@ export function ExportPage() {
   const [format, setFormat] = useState("hcl")
   const [error, setError] = useState<Error | undefined>(undefined)
   const [activeTab, setActiveTab] = useState(0)
-  const [resourceTypes, setResourceTypes] = useState<string[]>([])
+  const [resourceTypes, setResourceTypes] = useState<ResourceType[]>([])
   let content: React.ReactNode;
 
-  if (resourceTypes.length === 0) {
+  useEffect(()=>{
+    console.log("GETTING RESOURCE TYPES")
     getResourceTypes(setResourceTypes)
-  }
+  }, []);
   
   if (error) {
     content = <ErrorWithStack error={error} title={'Unexpected error'} errorInfo={null} />;
