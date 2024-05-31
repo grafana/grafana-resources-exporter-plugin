@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import { MultiSelect, Button } from '@grafana/ui'
 import { SelectableValue } from '@grafana/data'
 import { ResourceType } from '../types/resourceTypes'
@@ -10,55 +10,28 @@ interface ResourceTypeSelectorProps {
 }
 
 export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
-
-    const [resourceTypesSelectable, setResourceTypesSelectable] = useState<Array<SelectableValue<string>>>([])
-    const resourceTypeOptions: Array<SelectableValue> = []
-    
-    console.log("SELECTOR", props.resourceTypes, typeof props.resourceTypes)
-    useEffect(()=>{
-        const selected: any[] = []
-        props.resourceTypes.map((type: ResourceType)=>{
-            resourceTypeOptions.push({
-                    label: type,
-                    value: type,
-                })
-            if (type.selected) {
-                selected.push({
-                    label: type.name,
-                    value: type.name,
-                })
-            }
-        })
-        setResourceTypesSelectable(selected)
-    }, [props.resourceTypes, resourceTypeOptions])
+    const [selectedResourceTypes, setSelectedResourceTypes] = useState<SelectableValue[]>([])
 
     const selectResourceType = (selections: Array<SelectableValue<string>>) => {
-        setResourceTypesSelectable(selections)
-        const types: string[] = []
-        selections.forEach(selection=> selection.value && types.push(selection.value))
-        props.onChange(types)
-      }
-    
+        setSelectedResourceTypes(props.resourceTypes.filter((type) => selections.filter(s => s.value === type.name).length > 0).map((type) => { return { label: type.name, value: type.name } }))
+        props.onChange(props.resourceTypes.map((type) => { type.selected = selections.filter(s => s.value === type.name).length > 0; return type }))
+    }
+
     const selectAll = () => {
-        const selectables: Array<SelectableValue<string>> = []
-        props.resourceTypes.map((type)=>{
-            selectables.push({
-                label: type.name,
-                value: type.name,
-            })
-        })
-        setResourceTypesSelectable(selectables)
+        selectResourceType(props.resourceTypes.map((type) => { return { label: type.name, value: type.name } }))
     }
+
     const selectNone = () => {
-        setResourceTypesSelectable([])
+        selectResourceType([])
     }
+
     return <>
-            <MultiSelect className={props.className}
-                        options={resourceTypeOptions}
-                        value={resourceTypesSelectable}
-                        onChange={selectResourceType}
-            />
-            <Button onClick={selectAll}>Select all</Button>
-            <Button onClick={selectNone}>Select none</Button>
-          </>
+        <MultiSelect className={props.className}
+            options={props.resourceTypes.map((type) => { return { label: type.name, value: type.name } })}
+            value={selectedResourceTypes}
+            onChange={selectResourceType}
+        />
+        <Button onClick={selectAll}>Select all</Button>
+        <Button onClick={selectNone}>Select none</Button>
+    </>
 }
