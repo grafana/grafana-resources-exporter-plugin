@@ -6,7 +6,6 @@ import { ResourceType } from '../types/resourceTypes'
 interface ResourceTypeSelectorProps {
     resourceTypes: ResourceType[]
     onChange: any
-    className: any
 }
 
 export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
@@ -25,7 +24,6 @@ export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
 
     return <>
         <MultiSelect
-            className={props.className}
             maxVisibleValues={3}
             noMultiValueWrap={true}
             closeMenuOnSelect={false}

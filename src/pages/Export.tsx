@@ -114,8 +114,8 @@ export function ExportPage() {
         <div className={s.flex}>
           <RadioButtonGroup options={outputFormatOptions} disabledOptions={disabledOutputFormats} value={format} onChange={v => setFormat(v!)} size="md" />
           <Button className={s.marginLeft} icon="file-download" disabled={files.length === 0} onClick={_ => download()}>Download as zip</Button>
-          <Button className={s.marginLeft} icon="arrow-to-right" onClick={_ => generate()}>Generate</Button>
-          <ResourceTypeSelector className={s.marginLeft} resourceTypes={resourceTypes} onChange={setResourceTypes} />
+          <Button className={s.margin} icon="arrow-to-right" onClick={_ => generate()}>Generate</Button>
+          <ResourceTypeSelector resourceTypes={resourceTypes} onChange={setResourceTypes} />
         </div>
 
         {content}
@@ -130,6 +130,10 @@ const getStyles = (theme: GrafanaTheme2) => ({
   `,
   marginLeft: css`
     margin-left: ${theme.spacing(2)};
+  `,
+  margin: css`
+    margin-left: ${theme.spacing(2)};
+    margin-right: ${theme.spacing(2)};
   `,
   flex: css`
     display: flex;
