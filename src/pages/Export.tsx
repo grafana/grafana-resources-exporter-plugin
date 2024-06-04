@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import { PluginPage, getBackendSrv } from '@grafana/runtime';
-import { useStyles2, ErrorWithStack, Spinner, CodeEditor, RadioButtonGroup, Button, TabsBar, Tab, TabContent, Field, Checkbox } from '@grafana/ui';
+import { useStyles2, ErrorWithStack, Spinner, CodeEditor, RadioButtonGroup, Button, TabsBar, Tab, TabContent, Field } from '@grafana/ui';
 import { ResourceTypeSelector } from '../components/resourceTypeSelector'
 import { testIds } from '../components/testIds';
 import { GeneratedFile, GenerateResponse } from "../types/generator";
@@ -13,8 +13,9 @@ import { getResourceTypes } from '../hooks/resourceTypes'
 import { ResourceType } from '../types/resourceTypes'
 
 const outputFormatOptions = [
-  { label: 'HCL', value: 'hcl' },
-  { label: 'JSON', value: 'json' },
+  { label: 'Terraform HCL', value: 'hcl' },
+  { label: 'Terraform JSON', value: 'json' },
+  { label: 'Grizzly', value: 'grizzly' },
   { label: 'Crossplane', value: 'crossplane' }
 ];
 const disabledOutputFormats = ['crossplane']
@@ -32,8 +33,8 @@ export function ExportPage() {
 
   useEffect(() => {
     console.log("GETTING RESOURCE TYPES")
-    getResourceTypes(setResourceTypes)
-  }, []);
+    getResourceTypes(format, setResourceTypes)
+  }, [format]);
 
   if (error) {
     content = <ErrorWithStack error={error} title={'Unexpected error'} errorInfo={null} />;
@@ -69,8 +70,8 @@ export function ExportPage() {
   }
   const generate = async () => {
     let selected = 0
-    resourceTypes.forEach(t=>{if (t.selected) {selected++;}})
-    if (selected === 0 ) {
+    resourceTypes.forEach(t => { if (t.selected) { selected++; } })
+    if (selected === 0) {
       setError(new Error("No resource types selected"))
       return
     }

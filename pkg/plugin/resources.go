@@ -6,8 +6,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
+	"github.com/grafana/grizzly/pkg/grizzly"
 	tfgenerate "github.com/grafana/terraform-provider-grafana/v3/pkg/generate"
 	tfprovider "github.com/grafana/terraform-provider-grafana/v3/pkg/provider"
 )
@@ -54,36 +56,46 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	tmpDir, err := os.MkdirTemp("", "tf-generate-")
+	tmpDir, err := os.MkdirTemp("", "generate-")
 	if err != nil {
 		a.logger.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer func() {
-		a.logger.Debug("deleting tf-generate tmp directory")
+		a.logger.Debug("deleting generate tmp directory")
 		if err := os.RemoveAll(tmpDir); err != nil {
 			a.logger.Error(err.Error())
 		}
 	}()
 
-	genConfig := &tfgenerate.Config{
-		OutputDir:        tmpDir,
-		Clobber:          true,
-		ProviderVersion:  "v3.0.0", // TODO(kgz): can we get that from the tf provider itself?
-		Format:           body.OutputFormat,
-		IncludeResources: body.OnlyResources,
-		Grafana: &tfgenerate.GrafanaConfig{
-			URL:  a.config.JSONData.GrafanaURL,
-			Auth: a.config.SecureJSONData.ServiceAccountToken,
-		},
-		// Cloud: &tfgenerate.CloudConfig{},
-	}
+	if body.OutputFormat == "grizzly" {
+		registry := a.grizzlyRegistry()
+		eventsRecorder := grizzly.NewWriterRecorder(os.Stderr, grizzly.EventToPlainText)
+		if err := grizzly.Pull(registry, tmpDir, false, "yaml", body.OnlyResources, true, eventsRecorder); err != nil {
+			a.logger.Error(err.Error())
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		genConfig := &tfgenerate.Config{
+			OutputDir:        tmpDir,
+			Clobber:          true,
+			ProviderVersion:  "v3.0.0", // TODO(kgz): can we get that from the tf provider itself?
+			Format:           body.OutputFormat,
+			IncludeResources: body.OnlyResources,
+			Grafana: &tfgenerate.GrafanaConfig{
+				URL:  a.config.JSONData.GrafanaURL,
+				Auth: a.config.SecureJSONData.ServiceAccountToken,
+			},
+			// Cloud: &tfgenerate.CloudConfig{},
+		}
 
-	if err := tfgenerate.Generate(req.Context(), genConfig); err != nil {
-		a.logger.Error(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		if err := tfgenerate.Generate(req.Context(), genConfig); err != nil {
+			a.logger.Error(err.Error())
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	files, err := a.directoryToGeneratedFiles(tmpDir)
@@ -107,8 +119,7 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 }
 
 type resource struct {
-	Name      string `json:"name"`
-	HasLister bool   `json:"hasLister"`
+	Name string `json:"name"`
 }
 
 type resourceTypesResponse struct {
@@ -121,13 +132,32 @@ func (a *App) handleResourceTypes(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var resources []resource
-	for _, r := range tfprovider.Resources() {
-		resources = append(resources, resource{
-			Name:      r.Name,
-			HasLister: r.ListIDsFunc != nil,
-		})
+	// Parse req query params
+	outputFormat := req.URL.Query().Get("outputFormat")
+	if outputFormat == "" {
+		http.Error(w, "outputFormat query param is required", http.StatusBadRequest)
+		return
 	}
+
+	var resources []resource
+	if outputFormat == "grizzly" {
+		// Grizzly
+		grizzlyRegistry := a.grizzlyRegistry()
+		for _, handler := range grizzlyRegistry.HandlerOrder {
+			resources = append(resources, resource{Name: handler.Kind()})
+		}
+	} else {
+
+		for _, r := range tfprovider.Resources() {
+			if r.ListIDsFunc == nil {
+				continue
+			}
+			resources = append(resources, resource{Name: r.Name})
+		}
+	}
+	sort.Slice(resources, func(i, j int) bool {
+		return resources[i].Name < resources[j].Name
+	})
 
 	resp := resourceTypesResponse{
 		Resources: resources,
