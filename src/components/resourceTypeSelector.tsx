@@ -29,28 +29,34 @@ export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
   }
 
   return <div>
-            <div className={s.resourceTypeSelector}>
+            <div className={s.selector}>
             <Button size="sm" fill="text" onClick={_=>setAllResourceTypes(false)}>select none</Button>
             <Button size="sm" fill="text" onClick={_=>setAllResourceTypes(true)}>select all</Button>
             </div>
-            <div className={s.resourceTypeCheckbox}>
+            <div className={s.checkboxOuter}>
               {
-                props.resourceTypes.map((type: ResourceType, i: number) => {return <Checkbox className={s.checkbox} key={type.name} checked={type.selected} label={type.name} onChange={(e)=>{updateResourceTypes(i)}}/>})
+                props.resourceTypes.map((type: ResourceType, i: number) => {return <div key={type.name} className={s.checkboxDiv}><Checkbox className={s.checkbox} checked={type.selected} label={type.name} onChange={(e)=>{updateResourceTypes(i)}}/></div>})
               }
             </div>
         </div>;
 }
 const getStyles = (theme: GrafanaTheme2) => ({
-    checkbox: css`
-      margin-left: ${theme.spacing(2)};
-    `,
-    resourceTypeSelector: css`
+    selector: css`
       position: relative;
       top: -24px;
       left: 100px;
     `,
-    resourceTypeCheckbox: css`
+    checkboxOuter: css`
       position: relative;
       top: -20px;
+    `,
+    checkboxDiv: css`
+      margin-left: ${theme.spacing(2)};
+    `,
+    checkbox: css`
+      text-align: left;
+      float: left;
+      align-left: true;
+      width: 250px;
     `,
   });
