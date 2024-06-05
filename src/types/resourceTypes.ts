@@ -1,6 +1,5 @@
 export interface ResourceType {
     name: string
-    hasLister: boolean
     selected: boolean
 }
 

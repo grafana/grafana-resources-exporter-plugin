@@ -9,6 +9,9 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
+	grizzlyConfig "github.com/grafana/grizzly/pkg/config"
+	grizzlyGrafana "github.com/grafana/grizzly/pkg/grafana"
+	"github.com/grafana/grizzly/pkg/grizzly"
 )
 
 // Make sure App implements required interfaces. This is important to do
@@ -91,4 +94,12 @@ func (a *App) CheckHealth(_ context.Context, _ *backend.CheckHealthRequest) (*ba
 		Status:  backend.HealthStatusOk,
 		Message: "ok",
 	}, nil
+}
+
+func (a *App) grizzlyRegistry() grizzly.Registry {
+	grafanaProvider := grizzlyGrafana.NewProvider(&grizzlyConfig.GrafanaConfig{
+		URL:   a.config.JSONData.GrafanaURL,
+		Token: a.config.SecureJSONData.ServiceAccountToken,
+	})
+	return grizzly.NewRegistry([]grizzly.Provider{grafanaProvider})
 }
