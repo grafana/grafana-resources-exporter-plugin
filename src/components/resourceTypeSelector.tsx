@@ -28,6 +28,7 @@ export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
     props.onChange(updatedResourceTypes)
   }
 
+  const sorted = props.resourceTypes.sort((a: ResourceType, b: ResourceType)=> (a.name.localeCompare(b.name)))
   return <div>
             <div className={s.resourceTypeSelector}>
             <Button size="sm" fill="text" onClick={_=>setAllResourceTypes(false)}>select none</Button>
@@ -35,7 +36,7 @@ export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
             </div>
             <div className={s.resourceTypeCheckbox}>
               {
-                props.resourceTypes.map((type: ResourceType, i: number) => {return <Checkbox className={s.checkbox} key={type.name} checked={type.selected} label={type.name} onChange={(e)=>{updateResourceTypes(i)}}/>})
+                sorted.map((type: ResourceType, i: number) => {return <Checkbox className={s.checkbox} key={type.name} checked={type.selected} label={type.name} onChange={(e)=>{updateResourceTypes(i)}}/>})
               }
             </div>
         </div>;
