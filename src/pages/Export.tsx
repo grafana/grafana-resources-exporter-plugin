@@ -11,12 +11,13 @@ import JSZip from "jszip";
 import pluginJson from '../plugin.json'
 import { getResourceTypes } from '../hooks/resourceTypes'
 import { ResourceType } from '../types/resourceTypes'
-import { ResultViewer} from '../components/ResultViewer'
+import { ResultViewer } from '../components/ResultViewer'
 
 const outputFormatOptions = [
-  { label: 'Terraform HCL', value: 'hcl' },
-  { label: 'Terraform JSON', value: 'json' },
-  { label: 'Grizzly', value: 'grizzly' },
+  { label: 'Terraform HCL', value: 'terraform-hcl' },
+  { label: 'Terraform JSON', value: 'terraform-json' },
+  { label: 'Grizzly JSON', value: 'grizzly-json' },
+  { label: 'Grizzly YAML', value: 'grizzly-yaml' },
   { label: 'Crossplane', value: 'crossplane' }
 ];
 const disabledOutputFormats = ['crossplane']
@@ -26,10 +27,10 @@ export function ExportPage() {
 
   const [files, setFiles] = useState<GeneratedFile[]>([])
   const [loading, setLoading] = useState(false)
-  const [format, setFormat] = useState("hcl")
+  const [format, setFormat] = useState("terraform-hcl")
   const [error, setError] = useState<Error | undefined>(undefined)
   const [resourceTypes, setResourceTypes] = useState<ResourceType[]>([])
-  
+
   let content: React.ReactNode
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export function ExportPage() {
       <p>Once you have generated your resources, you can download them all as a zip file.</p>
     </div>
   } else {
-    content = <ResultViewer files={files} language="hcl"/>
+    content = <ResultViewer files={files} language="hcl" />
   }
   const generate = async () => {
     let selected = 0
