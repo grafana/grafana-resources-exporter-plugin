@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import { PluginPage, getBackendSrv } from '@grafana/runtime';
-import { useStyles2, ErrorWithStack, Spinner, CodeEditor, RadioButtonGroup, Button, TabsBar, Tab, TabContent, Field } from '@grafana/ui';
+import { useStyles2, ErrorWithStack, Spinner, RadioButtonGroup, Button, Field } from '@grafana/ui';
 import { ResourceTypeSelector } from '../components/resourceTypeSelector'
 import { testIds } from '../components/testIds';
 import { GeneratedFile, GenerateResponse } from "../types/generator";
@@ -11,6 +11,7 @@ import JSZip from "jszip";
 import pluginJson from '../plugin.json'
 import { getResourceTypes } from '../hooks/resourceTypes'
 import { ResourceType } from '../types/resourceTypes'
+import { ResultViewer} from '../components/ResultViewer'
 
 const outputFormatOptions = [
   { label: 'Terraform HCL', value: 'hcl' },
@@ -27,8 +28,8 @@ export function ExportPage() {
   const [loading, setLoading] = useState(false)
   const [format, setFormat] = useState("hcl")
   const [error, setError] = useState<Error | undefined>(undefined)
-  const [activeTab, setActiveTab] = useState(0)
   const [resourceTypes, setResourceTypes] = useState<ResourceType[]>([])
+  
   let content: React.ReactNode
 
   useEffect(() => {
@@ -48,25 +49,7 @@ export function ExportPage() {
       <p>Once you have generated your resources, you can download them all as a zip file.</p>
     </div>
   } else {
-    let fileContent = files[activeTab].content
-    content = (
-      <div className={s.marginTop}>
-        <TabsBar>
-          {files.map((file, i) => (<Tab key={i} active={i === activeTab} label={file.name} onChangeTab={_ => { setActiveTab(i) }} />))}
-        </TabsBar>
-        <TabContent>
-          <CodeEditor
-            width="100%"
-            height="500px"
-            value={fileContent}
-            language="hcl"
-            showLineNumbers={true}
-            showMiniMap={true}
-            readOnly={true}
-          />
-        </TabContent>
-      </div>
-    );
+    content = <ResultViewer files={files} language="hcl"/>
   }
   const generate = async () => {
     let selected = 0
