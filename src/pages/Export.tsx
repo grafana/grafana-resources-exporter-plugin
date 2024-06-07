@@ -50,7 +50,7 @@ export function ExportPage() {
       <p>Once you have generated your resources, you can download them all as a zip file.</p>
     </div>
   } else {
-    content = <ResultViewer files={files} language="hcl" />
+    content = <ResultViewer files={files} />
   }
   const generate = async () => {
     let selected = 0
