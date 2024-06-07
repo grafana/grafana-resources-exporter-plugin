@@ -21,7 +21,7 @@ func (a *App) registerRoutes(mux *http.ServeMux) {
 }
 
 type generateRequest struct {
-	OutputFormat tfgenerate.OutputFormat `json:"outputFormat"`
+	OutputFormat string `json:"outputFormat"`
 
 	// OnlyResources is a list of patterns to filter resources by.
 	// If a resource name matches any of the patterns, it will be included in the output.
@@ -69,10 +69,10 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 		}
 	}()
 
-	if body.OutputFormat == "grizzly" {
+	if strings.HasPrefix(body.OutputFormat, "grizzly") {
 		registry := a.grizzlyRegistry()
 		eventsRecorder := grizzly.NewWriterRecorder(os.Stderr, grizzly.EventToPlainText)
-		if err := grizzly.Pull(registry, tmpDir, false, "yaml", body.OnlyResources, true, eventsRecorder); err != nil {
+		if err := grizzly.Pull(registry, tmpDir, false, strings.TrimPrefix(body.OutputFormat, "grizzly-"), body.OnlyResources, true, eventsRecorder); err != nil {
 			a.logger.Error(err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -82,7 +82,7 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 			OutputDir:        tmpDir,
 			Clobber:          true,
 			ProviderVersion:  "v3.0.0", // TODO(kgz): can we get that from the tf provider itself?
-			Format:           body.OutputFormat,
+			Format:           tfgenerate.OutputFormat(strings.TrimPrefix(body.OutputFormat, "terraform-")),
 			IncludeResources: body.OnlyResources,
 			Grafana: &tfgenerate.GrafanaConfig{
 				URL:  a.config.JSONData.GrafanaURL,
@@ -140,7 +140,7 @@ func (a *App) handleResourceTypes(w http.ResponseWriter, req *http.Request) {
 	}
 
 	var resources []resource
-	if outputFormat == "grizzly" {
+	if strings.HasPrefix(outputFormat, "grizzly") {
 		// Grizzly
 		grizzlyRegistry := a.grizzlyRegistry()
 		for _, handler := range grizzlyRegistry.HandlerOrder {
