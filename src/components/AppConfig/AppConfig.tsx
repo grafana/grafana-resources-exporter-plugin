@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
 import { lastValueFrom } from 'rxjs';
 import { css } from '@emotion/css';
-import { AppPluginMeta, GrafanaTheme2, PluginConfigPageProps, PluginMeta } from '@grafana/data';
+import { AppPluginMeta, GrafanaTheme2, KeyValue, PluginConfigPageProps, PluginMeta } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
 import { Button, Field, FieldSet, Input, SecretInput, useStyles2 } from '@grafana/ui';
 import { testIds } from '../testIds';
@@ -9,16 +9,21 @@ import { testIds } from '../testIds';
 export type AppPluginSettings = {
   grafanaUrl?: string;
   serviceAccountToken?: string;
+  cloudOrg?: string;
+  cloudAccessPolicyToken?: string;
 };
 
 type State = {
   grafanaUrl: string;
   serviceAccountToken: string;
+  cloudOrg: string;
+  cloudAccessPolicyToken: string;
 
   isServiceAccountTokenSet: boolean;
+  isCloudAccessPolicyTokenSet: boolean;
 };
 
-export interface AppConfigProps extends PluginConfigPageProps<AppPluginMeta<AppPluginSettings>> {}
+export interface AppConfigProps extends PluginConfigPageProps<AppPluginMeta<AppPluginSettings>> { }
 
 export const AppConfig = ({ plugin }: AppConfigProps) => {
   const s = useStyles2(getStyles);
@@ -26,7 +31,10 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
   const [state, setState] = useState<State>({
     grafanaUrl: jsonData?.grafanaUrl || '',
     serviceAccountToken: '',
+    cloudOrg: jsonData?.cloudOrg || '',
+    cloudAccessPolicyToken: '',
     isServiceAccountTokenSet: Boolean(secureJsonFields?.serviceAccountToken),
+    isCloudAccessPolicyTokenSet: Boolean(secureJsonFields?.cloudAccessPolicyToken),
   });
 
   const onResetApiKey = () =>
@@ -34,6 +42,13 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
       ...state,
       serviceAccountToken: '',
       isServiceAccountTokenSet: false,
+    });
+
+  const onResetAccessPolicyToken = () =>
+    setState({
+      ...state,
+      cloudAccessPolicyToken: '',
+      isCloudAccessPolicyTokenSet: false,
     });
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -48,15 +63,16 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
       <FieldSet label="API Settings">
         <Field label="Grafana Url" description="" className={s.marginTop}>
           <Input
-              width={60}
-              name="grafanaUrl"
-              id="config-api-url"
-              data-testid={testIds.appConfig.grafanaUrl}
-              value={state.grafanaUrl}
-              placeholder={`E.g.: https://my-grafana-instance.com`}
-              onChange={onChange}
+            width={60}
+            name="grafanaUrl"
+            id="config-api-url"
+            data-testid={testIds.appConfig.grafanaUrl}
+            value={state.grafanaUrl}
+            placeholder={`E.g.: https://my-grafana-instance.com`}
+            onChange={onChange}
           />
         </Field>
+
 
         <Field label="Service Account Token" description="A service account token.">
           <SecretInput
@@ -72,27 +88,60 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
           />
         </Field>
 
+        <Field label="Cloud Org" description="" className={s.marginTop}>
+          <Input
+            width={60}
+            name="cloudOrg"
+            id="config-cloud-org"
+            value={state.cloudOrg}
+            placeholder={`E.g.: my-cloud-org`}
+            onChange={onChange}
+          />
+        </Field>
+
+        <Field label="Cloud Access Policy Token" description="">
+          <SecretInput
+            width={60}
+            id="config-cloud-access-policy-token"
+            name="cloudAccessPolicyToken"
+            value={state.cloudAccessPolicyToken}
+            isConfigured={state.isCloudAccessPolicyTokenSet}
+            placeholder={'Access policy token'}
+            onChange={onChange}
+            onReset={onResetAccessPolicyToken}
+          />
+        </Field>
+
         <div className={s.marginTop}>
           <Button
             type="submit"
             data-testid={testIds.appConfig.submit}
-            onClick={() =>
-              updatePluginAndReload(plugin.meta.id, {
+            onClick={() => {
+              const secureJsonData: KeyValue<any> = {};
+              if (!state.isServiceAccountTokenSet) {
+                secureJsonData.serviceAccountToken = state.serviceAccountToken;
+              }
+              if (!state.isCloudAccessPolicyTokenSet) {
+                secureJsonData.cloudAccessPolicyToken = state.cloudAccessPolicyToken;
+              }
+
+              return updatePluginAndReload(plugin.meta.id, {
                 enabled,
                 pinned,
                 jsonData: {
                   grafanaUrl: state.grafanaUrl,
+                  cloudOrg: state.cloudOrg,
                 },
                 // This cannot be queried later by the frontend.
                 // We don't want to override it in case it was set previously and left untouched now.
-                secureJsonData: state.isServiceAccountTokenSet
-                  ? undefined
-                  : {
-                      serviceAccountToken: state.serviceAccountToken,
-                    },
+                secureJsonData: secureJsonData,
               })
             }
-            disabled={Boolean(!state.grafanaUrl || (!state.isServiceAccountTokenSet && !state.serviceAccountToken))}
+            }
+            disabled={Boolean(!state.grafanaUrl ||
+              (!state.isServiceAccountTokenSet && !state.serviceAccountToken) ||
+              !state.cloudOrg ||
+              (!state.isCloudAccessPolicyTokenSet && !state.cloudAccessPolicyToken))}
           >
             Save API settings
           </Button>

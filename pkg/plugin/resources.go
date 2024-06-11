@@ -21,6 +21,7 @@ func (a *App) registerRoutes(mux *http.ServeMux) {
 }
 
 type generateRequest struct {
+	Target       string `json:"target"`
 	OutputFormat string `json:"outputFormat"`
 
 	// OnlyResources is a list of patterns to filter resources by.
@@ -84,11 +85,17 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 			ProviderVersion:  "v3.0.0", // TODO(kgz): can we get that from the tf provider itself?
 			Format:           tfgenerate.OutputFormat(strings.TrimPrefix(body.OutputFormat, "terraform-")),
 			IncludeResources: body.OnlyResources,
-			Grafana: &tfgenerate.GrafanaConfig{
+		}
+		if body.Target == "cloud" {
+			genConfig.Cloud = &tfgenerate.CloudConfig{
+				Org:               a.config.JSONData.CloudOrg,
+				AccessPolicyToken: a.config.SecureJSONData.CloudAccessPolicyToken,
+			}
+		} else {
+			genConfig.Grafana = &tfgenerate.GrafanaConfig{
 				URL:  a.config.JSONData.GrafanaURL,
 				Auth: a.config.SecureJSONData.ServiceAccountToken,
-			},
-			// Cloud: &tfgenerate.CloudConfig{},
+			}
 		}
 
 		if err := tfgenerate.Generate(req.Context(), genConfig); err != nil {
@@ -139,6 +146,12 @@ func (a *App) handleResourceTypes(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	target := req.URL.Query().Get("target")
+	if outputFormat == "" {
+		http.Error(w, "target query param is required", http.StatusBadRequest)
+		return
+	}
+
 	var resources []resource
 	if strings.HasPrefix(outputFormat, "grizzly") {
 		// Grizzly
@@ -147,17 +160,20 @@ func (a *App) handleResourceTypes(w http.ResponseWriter, req *http.Request) {
 			resources = append(resources, resource{Name: handler.Kind()})
 		}
 	} else {
-
 		for _, r := range tfprovider.Resources() {
 			if r.ListIDsFunc == nil {
 				continue
 			}
 			// TODO: Cloud resources
-			switch string(r.Category) {
-			case "Cloud", "Machine Learning", "OnCall", "SLO", "Synthetic Monitoring":
-				continue
-			default:
+			if target == "cloud" && r.Category == "Cloud" {
 				resources = append(resources, resource{Name: r.Name})
+			} else if target != "cloud" {
+				switch string(r.Category) {
+				case "Cloud", "Machine Learning", "OnCall", "SLO", "Synthetic Monitoring":
+					continue
+				default:
+					resources = append(resources, resource{Name: r.Name})
+				}
 			}
 		}
 	}
