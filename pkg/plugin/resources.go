@@ -152,7 +152,13 @@ func (a *App) handleResourceTypes(w http.ResponseWriter, req *http.Request) {
 			if r.ListIDsFunc == nil {
 				continue
 			}
-			resources = append(resources, resource{Name: r.Name})
+			// TODO: Cloud resources
+			switch string(r.Category) {
+			case "Cloud", "Machine Learning", "OnCall", "SLO", "Synthetic Monitoring":
+				continue
+			default:
+				resources = append(resources, resource{Name: r.Name})
+			}
 		}
 	}
 	sort.Slice(resources, func(i, j int) bool {

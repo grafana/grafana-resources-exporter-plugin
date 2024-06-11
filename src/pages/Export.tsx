@@ -20,7 +20,7 @@ const outputFormatOptions = [
   { label: 'Grizzly YAML', value: 'grizzly-yaml' },
   { label: 'Crossplane', value: 'crossplane' }
 ];
-const disabledOutputFormats = ['crossplane']
+const disabledOutputFormats: string[] = []
 
 export function ExportPage() {
   const s = useStyles2(getStyles);
