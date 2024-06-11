@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { css } from '@emotion/css';
-import { GrafanaTheme2 } from '@grafana/data';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { PluginPage, getBackendSrv } from '@grafana/runtime';
 import { useStyles2, ErrorWithStack, Spinner, RadioButtonGroup, Button, Field } from '@grafana/ui';
 import { ResourceTypeSelector } from '../components/resourceTypeSelector'
@@ -13,30 +13,47 @@ import { getResourceTypes } from '../hooks/resourceTypes'
 import { ResourceType } from '../types/resourceTypes'
 import { ResultViewer } from '../components/ResultViewer'
 
-const outputFormatOptions = [
-  { label: 'Terraform HCL', value: 'terraform-hcl' },
-  { label: 'Terraform JSON', value: 'terraform-json' },
-  { label: 'Grizzly JSON', value: 'grizzly-json' },
-  { label: 'Grizzly YAML', value: 'grizzly-yaml' },
-  { label: 'Crossplane', value: 'crossplane' }
+const targetOptions = [
+  { label: 'This Grafana instance', value: 'grafana' },
+  { label: 'Grafana Cloud', value: 'cloud' },
 ];
-const disabledOutputFormats: string[] = []
+
 
 export function ExportPage() {
   const s = useStyles2(getStyles);
 
   const [files, setFiles] = useState<GeneratedFile[]>([])
   const [loading, setLoading] = useState(false)
+  const [target, setTarget] = useState("grafana")
   const [format, setFormat] = useState("terraform-hcl")
+  const [outputFormatOptions, setOutputFormatOptions] = useState<SelectableValue[]>([])
   const [error, setError] = useState<Error | undefined>(undefined)
   const [resourceTypes, setResourceTypes] = useState<ResourceType[]>([])
 
   let content: React.ReactNode
 
+  // Only terraform and crossplane formats are supported for Cloud
+  useEffect(() => {
+    if (target === "cloud" && format.startsWith("grizzly")) {
+      setFormat("terraform-hcl")
+    }
+
+    const formatOptions = [
+      { label: 'Terraform HCL', value: 'terraform-hcl' },
+      { label: 'Terraform JSON', value: 'terraform-json' },
+      { label: 'Crossplane', value: 'crossplane' },
+    ];
+    if (target !== "cloud") {
+      formatOptions.push({ label: 'Grizzly JSON', value: 'grizzly-json' })
+      formatOptions.push({ label: 'Grizzly YAML', value: 'grizzly-yaml' })
+    }
+    setOutputFormatOptions(formatOptions)
+  }, [target, format])
+
   useEffect(() => {
     console.log("GETTING RESOURCE TYPES")
-    getResourceTypes(format, setResourceTypes)
-  }, [format]);
+    getResourceTypes(target, format, setResourceTypes)
+  }, [target, format]);
 
   if (error) {
     content = <ErrorWithStack error={error} title={'Unexpected error'} errorInfo={null} />;
@@ -68,6 +85,7 @@ export function ExportPage() {
         }
       })
       const exports = await getBackendSrv().post<GenerateResponse>(`api/plugins/${pluginJson.id}/resources/generate`, {
+        target: target,
         outputFormat: format,
         onlyResources: types,
       });
@@ -102,8 +120,11 @@ export function ExportPage() {
       <div data-testid={testIds.exportPage.container}>
         <h2>Render your Grafana resources in Terraform</h2>
         <div>
+          <Field label="Target">
+            <RadioButtonGroup options={targetOptions} value={target} onChange={v => setTarget(v!)} size="md" />
+          </Field>
           <Field label="Output format">
-            <RadioButtonGroup options={outputFormatOptions} disabledOptions={disabledOutputFormats} value={format} onChange={v => setFormat(v!)} size="md" />
+            <RadioButtonGroup options={outputFormatOptions} value={format} onChange={v => setFormat(v!)} size="md" />
           </Field>
         </div>
         <div>

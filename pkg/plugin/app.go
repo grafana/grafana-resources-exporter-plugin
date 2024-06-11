@@ -26,10 +26,12 @@ var (
 
 type JSONData struct {
 	GrafanaURL string `json:"grafanaUrl"`
+	CloudOrg   string `json:"cloudOrg"`
 }
 
 type EncodedSecureJSONData struct {
-	ServiceAccountToken string `json:"serviceAccountToken"`
+	ServiceAccountToken    string `json:"serviceAccountToken"`
+	CloudAccessPolicyToken string `json:"cloudAccessPolicyToken"`
 }
 
 type Config struct {
@@ -47,6 +49,9 @@ func (config *Config) FromAppInstanceSettings(settings backend.AppInstanceSettin
 	if settings.DecryptedSecureJSONData != nil {
 		if saToken, ok := settings.DecryptedSecureJSONData["serviceAccountToken"]; ok {
 			config.SecureJSONData.ServiceAccountToken = saToken
+		}
+		if capToken, ok := settings.DecryptedSecureJSONData["cloudAccessPolicyToken"]; ok {
+			config.SecureJSONData.CloudAccessPolicyToken = capToken
 		}
 	}
 
