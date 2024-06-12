@@ -81,7 +81,7 @@ jobs:
 
       - name: Sign plugin
         # TODO: remove rootUrls when plugin is made public
-        run: npm run sign --rootUrls https://cattestplugin.grafana.net
+        run: npx --yes @grafana/sign-plugin@latest --rootUrls https://cattestplugin.grafana.net
         if: ${{ env.GRAFANA_ACCESS_POLICY_TOKEN != '' }}
 
       - name: Get plugin metadata
