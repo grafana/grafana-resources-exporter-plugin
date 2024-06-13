@@ -9,6 +9,10 @@ import { testIds } from '../testIds';
 export type AppPluginSettings = {
   grafanaUrl?: string;
   serviceAccountToken?: string;
+  smUrl?: string;
+  smToken?: string;
+  oncallUrl?: string;
+  oncallToken?: string;
   cloudOrg?: string;
   cloudAccessPolicyToken?: string;
 };
@@ -16,10 +20,16 @@ export type AppPluginSettings = {
 type State = {
   grafanaUrl: string;
   serviceAccountToken: string;
+  smUrl: string;
+  smToken: string;
+  oncallUrl: string;
+  oncallToken: string;
   cloudOrg: string;
   cloudAccessPolicyToken: string;
 
   isServiceAccountTokenSet: boolean;
+  isSMTokenSet: boolean;
+  isOnCallTokenSet: boolean;
   isCloudAccessPolicyTokenSet: boolean;
 };
 
@@ -31,9 +41,15 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
   const [state, setState] = useState<State>({
     grafanaUrl: jsonData?.grafanaUrl || '',
     serviceAccountToken: '',
+    smUrl: jsonData?.smUrl || '',
+    smToken: '',
+    oncallUrl: jsonData?.oncallUrl || '',
+    oncallToken: '',
     cloudOrg: jsonData?.cloudOrg || '',
     cloudAccessPolicyToken: '',
     isServiceAccountTokenSet: Boolean(secureJsonFields?.serviceAccountToken),
+    isSMTokenSet: Boolean(secureJsonFields?.smToken),
+    isOnCallTokenSet: Boolean(secureJsonFields?.oncallToken),
     isCloudAccessPolicyTokenSet: Boolean(secureJsonFields?.cloudAccessPolicyToken),
   });
 
@@ -49,6 +65,20 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
       ...state,
       cloudAccessPolicyToken: '',
       isCloudAccessPolicyTokenSet: false,
+    });
+
+  const onResetSMToken = () =>
+    setState({
+      ...state,
+      smToken: '',
+      isSMTokenSet: false,
+    });
+
+  const onResetOncallToken = () =>
+    setState({
+      ...state,
+      oncallToken: '',
+      isOnCallTokenSet: false,
     });
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -88,6 +118,54 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
           />
         </Field>
 
+        <Field label="SM Url" description="" className={s.marginTop}>
+          <Input
+            width={60}
+            name="smUrl"
+            id="config-sm-url"
+            value={state.smUrl}
+            placeholder={`E.g.: https://my-sm-instance.com`}
+            onChange={onChange}
+          />
+        </Field>
+
+        <Field label="SM Token" description="">
+          <SecretInput
+            width={60}
+            id="config-sm-token"
+            name="smToken"
+            value={state.smToken}
+            placeholder={'Your SM token'}
+            onChange={onChange}
+            isConfigured={state.isSMTokenSet}
+            onReset={onResetSMToken}
+          />
+        </Field>
+
+        <Field label="Oncall Url" description="" className={s.marginTop}>
+          <Input
+            width={60}
+            name="oncallUrl"
+            id="config-oncall-url"
+            value={state.oncallUrl}
+            placeholder={`E.g.: https://my-oncall-instance.com`}
+            onChange={onChange}
+          />
+        </Field>
+
+        <Field label="Oncall Token" description="">
+          <SecretInput
+            width={60}
+            id="config-oncall-token"
+            name="oncallToken"
+            value={state.oncallToken}
+            placeholder={'Your oncall token'}
+            onChange={onChange}
+            isConfigured={state.isOnCallTokenSet}
+            onReset={onResetOncallToken}
+          />
+        </Field>
+
         <Field label="Cloud Org" description="" className={s.marginTop}>
           <Input
             width={60}
@@ -124,6 +202,12 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
               if (!state.isCloudAccessPolicyTokenSet) {
                 secureJsonData.cloudAccessPolicyToken = state.cloudAccessPolicyToken;
               }
+              if (!state.isSMTokenSet) {
+                secureJsonData.smToken = state.smToken;
+              }
+              if (!state.isOnCallTokenSet) {
+                secureJsonData.oncallToken = state.oncallToken;
+              }
 
               return updatePluginAndReload(plugin.meta.id, {
                 enabled,
@@ -131,6 +215,8 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
                 jsonData: {
                   grafanaUrl: state.grafanaUrl,
                   cloudOrg: state.cloudOrg,
+                  smUrl: state.smUrl,
+                  oncallUrl: state.oncallUrl,
                 },
                 // This cannot be queried later by the frontend.
                 // We don't want to override it in case it was set previously and left untouched now.

@@ -12,6 +12,7 @@ import (
 	grizzlyConfig "github.com/grafana/grizzly/pkg/config"
 	grizzlyGrafana "github.com/grafana/grizzly/pkg/grafana"
 	"github.com/grafana/grizzly/pkg/grizzly"
+	grizzlySM "github.com/grafana/grizzly/pkg/syntheticmonitoring"
 )
 
 // Make sure App implements required interfaces. This is important to do
@@ -26,11 +27,15 @@ var (
 
 type JSONData struct {
 	GrafanaURL string `json:"grafanaUrl"`
+	SMURL      string `json:"smUrl"`
+	OnCallURL  string `json:"oncallUrl"`
 	CloudOrg   string `json:"cloudOrg"`
 }
 
 type EncodedSecureJSONData struct {
 	ServiceAccountToken    string `json:"serviceAccountToken"`
+	SMToken                string `json:"smToken"`
+	OnCallToken            string `json:"oncallToken"`
 	CloudAccessPolicyToken string `json:"cloudAccessPolicyToken"`
 }
 
@@ -52,6 +57,12 @@ func (config *Config) FromAppInstanceSettings(settings backend.AppInstanceSettin
 		}
 		if capToken, ok := settings.DecryptedSecureJSONData["cloudAccessPolicyToken"]; ok {
 			config.SecureJSONData.CloudAccessPolicyToken = capToken
+		}
+		if smToken, ok := settings.DecryptedSecureJSONData["smToken"]; ok {
+			config.SecureJSONData.SMToken = smToken
+		}
+		if ocToken, ok := settings.DecryptedSecureJSONData["oncallToken"]; ok {
+			config.SecureJSONData.OnCallToken = ocToken
 		}
 	}
 
@@ -106,5 +117,12 @@ func (a *App) grizzlyRegistry() grizzly.Registry {
 		URL:   a.config.JSONData.GrafanaURL,
 		Token: a.config.SecureJSONData.ServiceAccountToken,
 	})
-	return grizzly.NewRegistry([]grizzly.Provider{grafanaProvider})
+	providers := []grizzly.Provider{grafanaProvider}
+	if a.config.SecureJSONData.SMToken != "" {
+		providers = append(providers, grizzlySM.NewProvider(&grizzlyConfig.SyntheticMonitoringConfig{
+			URL:   a.config.JSONData.SMURL,
+			Token: a.config.SecureJSONData.SMToken,
+		}))
+	}
+	return grizzly.NewRegistry(providers)
 }
