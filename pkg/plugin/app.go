@@ -12,6 +12,7 @@ import (
 	grizzlyConfig "github.com/grafana/grizzly/pkg/config"
 	grizzlyGrafana "github.com/grafana/grizzly/pkg/grafana"
 	"github.com/grafana/grizzly/pkg/grizzly"
+	grizzlySM "github.com/grafana/grizzly/pkg/syntheticmonitoring"
 )
 
 // Make sure App implements required interfaces. This is important to do
@@ -117,8 +118,8 @@ func (a *App) grizzlyRegistry() grizzly.Registry {
 		Token: a.config.SecureJSONData.ServiceAccountToken,
 	})
 	providers := []grizzly.Provider{grafanaProvider}
-	if a.config.JSONData.SMURL != "" {
-		providers = append(providers, grizzlyGrafana.NewProvider(&grizzlyConfig.GrafanaConfig{
+	if a.config.SecureJSONData.SMToken != "" {
+		providers = append(providers, grizzlySM.NewProvider(&grizzlyConfig.SyntheticMonitoringConfig{
 			URL:   a.config.JSONData.SMURL,
 			Token: a.config.SecureJSONData.SMToken,
 		}))

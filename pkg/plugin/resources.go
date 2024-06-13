@@ -96,11 +96,11 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 				URL:  a.config.JSONData.GrafanaURL,
 				Auth: a.config.SecureJSONData.ServiceAccountToken,
 			}
-			if a.config.JSONData.SMURL != "" {
+			if a.config.SecureJSONData.SMToken != "" {
 				genConfig.Grafana.SMURL = a.config.JSONData.SMURL
 				genConfig.Grafana.SMAccessToken = a.config.SecureJSONData.SMToken
 			}
-			if a.config.JSONData.OnCallURL != "" {
+			if a.config.SecureJSONData.OnCallToken != "" {
 				genConfig.Grafana.OnCallURL = a.config.JSONData.OnCallURL
 				genConfig.Grafana.OnCallAccessToken = a.config.SecureJSONData.OnCallToken
 			}
@@ -178,11 +178,11 @@ func (a *App) handleResourceTypes(w http.ResponseWriter, req *http.Request) {
 			} else if target != "cloud" {
 				switch string(r.Category) {
 				case "Synthetic Monitoring":
-					if a.config.JSONData.SMURL != "" {
+					if a.config.SecureJSONData.SMToken != "" {
 						resources = append(resources, resource{Name: r.Name})
 					}
 				case "OnCall":
-					if a.config.JSONData.OnCallURL != "" {
+					if a.config.SecureJSONData.OnCallToken != "" {
 						resources = append(resources, resource{Name: r.Name})
 					}
 				case "Cloud", "Machine Learning", "SLO":
