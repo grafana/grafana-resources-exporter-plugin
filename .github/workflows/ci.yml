@@ -15,7 +15,7 @@ permissions: read-all
 jobs:
   build:
     name: Build, lint and unit tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-cores
     outputs:
       plugin-id: ${{ steps.metadata.outputs.plugin-id }}
       plugin-version: ${{ steps.metadata.outputs.plugin-version }}
@@ -80,7 +80,8 @@ jobs:
           fi
 
       - name: Sign plugin
-        run: npm run sign
+        # TODO: remove rootUrls when plugin is made public
+        run: npx --yes @grafana/sign-plugin@latest --rootUrls https://cattestplugin.grafana.net,http://localhost:3000
         if: ${{ env.GRAFANA_ACCESS_POLICY_TOKEN != '' }}
 
       - name: Get plugin metadata
@@ -135,11 +136,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            provisioning
-            tests
-            .config
 
       - name: Download plugin
         if: needs.build.outputs.has-backend == 'true'
@@ -151,7 +147,7 @@ jobs:
       - name: Execute permissions on binary
         if: needs.build.outputs.has-backend == 'true'
         run: |
-          chmod +x ./dist/gpx_cicd_linux_amd64
+          chmod +x ./dist/gpx_grafana_cat_plugin_linux_amd64
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
