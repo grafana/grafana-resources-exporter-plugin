@@ -26,11 +26,15 @@ var (
 
 type JSONData struct {
 	GrafanaURL string `json:"grafanaUrl"`
+	SMURL      string `json:"smUrl"`
+	OnCallURL  string `json:"oncallUrl"`
 	CloudOrg   string `json:"cloudOrg"`
 }
 
 type EncodedSecureJSONData struct {
 	ServiceAccountToken    string `json:"serviceAccountToken"`
+	SMToken                string `json:"smToken"`
+	OnCallToken            string `json:"oncallToken"`
 	CloudAccessPolicyToken string `json:"cloudAccessPolicyToken"`
 }
 
@@ -52,6 +56,12 @@ func (config *Config) FromAppInstanceSettings(settings backend.AppInstanceSettin
 		}
 		if capToken, ok := settings.DecryptedSecureJSONData["cloudAccessPolicyToken"]; ok {
 			config.SecureJSONData.CloudAccessPolicyToken = capToken
+		}
+		if smToken, ok := settings.DecryptedSecureJSONData["smToken"]; ok {
+			config.SecureJSONData.SMToken = smToken
+		}
+		if ocToken, ok := settings.DecryptedSecureJSONData["oncallToken"]; ok {
+			config.SecureJSONData.OnCallToken = ocToken
 		}
 	}
 
@@ -106,5 +116,12 @@ func (a *App) grizzlyRegistry() grizzly.Registry {
 		URL:   a.config.JSONData.GrafanaURL,
 		Token: a.config.SecureJSONData.ServiceAccountToken,
 	})
-	return grizzly.NewRegistry([]grizzly.Provider{grafanaProvider})
+	providers := []grizzly.Provider{grafanaProvider}
+	if a.config.JSONData.SMURL != "" {
+		providers = append(providers, grizzlyGrafana.NewProvider(&grizzlyConfig.GrafanaConfig{
+			URL:   a.config.JSONData.SMURL,
+			Token: a.config.SecureJSONData.SMToken,
+		}))
+	}
+	return grizzly.NewRegistry(providers)
 }

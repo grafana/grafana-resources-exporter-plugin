@@ -96,6 +96,14 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 				URL:  a.config.JSONData.GrafanaURL,
 				Auth: a.config.SecureJSONData.ServiceAccountToken,
 			}
+			if a.config.JSONData.SMURL != "" {
+				genConfig.Grafana.SMURL = a.config.JSONData.SMURL
+				genConfig.Grafana.SMAccessToken = a.config.SecureJSONData.SMToken
+			}
+			if a.config.JSONData.OnCallURL != "" {
+				genConfig.Grafana.OnCallURL = a.config.JSONData.OnCallURL
+				genConfig.Grafana.OnCallAccessToken = a.config.SecureJSONData.OnCallToken
+			}
 		}
 
 		if err := tfgenerate.Generate(req.Context(), genConfig); err != nil {
@@ -169,7 +177,15 @@ func (a *App) handleResourceTypes(w http.ResponseWriter, req *http.Request) {
 				resources = append(resources, resource{Name: r.Name})
 			} else if target != "cloud" {
 				switch string(r.Category) {
-				case "Cloud", "Machine Learning", "OnCall", "SLO", "Synthetic Monitoring":
+				case "Synthetic Monitoring":
+					if a.config.JSONData.SMURL != "" {
+						resources = append(resources, resource{Name: r.Name})
+					}
+				case "OnCall":
+					if a.config.JSONData.OnCallURL != "" {
+						resources = append(resources, resource{Name: r.Name})
+					}
+				case "Cloud", "Machine Learning", "SLO":
 					continue
 				default:
 					resources = append(resources, resource{Name: r.Name})
