@@ -1,12 +1,14 @@
 {
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
   "type": "app",
-  "name": "grafana-cat-plugin",
+  "name": "Grafana Resources Exporter",
   "id": "grafana-catplugin-app",
   "backend": true,
   "executable": "gpx_grafana_cat_plugin",
   "info": {
-    "keywords": ["app"],
+    "keywords": [
+      "app"
+    ],
     "description": "",
     "author": {
       "name": "Grafana"

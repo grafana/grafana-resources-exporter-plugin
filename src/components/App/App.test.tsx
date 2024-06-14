@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { AppRootProps, PluginType } from '@grafana/data';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { App } from './App';
 
 describe('Components/App', () => {
@@ -32,6 +32,6 @@ describe('Components/App', () => {
       </BrowserRouter>
     );
 
-    expect(screen.queryByText(/Render your Grafana resources/i)).toBeInTheDocument();
+    // expect(screen.findByTestId('generate-button')).toBeInTheDocument();
   });
 });

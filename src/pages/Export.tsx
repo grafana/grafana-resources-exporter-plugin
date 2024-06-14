@@ -62,8 +62,7 @@ export function ExportPage() {
   } else if (files?.length === 0) {
     content = <div className={s.marginTop}>
       <p>Resources within Grafana can be represented in other formats.</p>
-      <p>Use the `Generate` button above to render all Grafana resources as Terraform files.
-        You have a choice of HCL and JSON formats (with Crossplane and others coming).</p>
+      <p>Use the `Generate` button above to render all Grafana resources as Terraform, Crossplane or Grizzly files.</p>
       <p>Once you have generated your resources, you can download them all as a zip file.</p>
     </div>
   } else {
@@ -118,7 +117,6 @@ export function ExportPage() {
   return (
     <PluginPage>
       <div data-testid={testIds.exportPage.container}>
-        <h2>Render your Grafana resources in Terraform</h2>
         <div>
           <Field label="Target">
             <RadioButtonGroup options={targetOptions} value={target} onChange={v => setTarget(v!)} size="md" />
@@ -133,7 +131,7 @@ export function ExportPage() {
           </Field>
         </div>
         <div>
-          <Button icon="arrow-to-right" onClick={_ => generate()}>Generate</Button>
+          <Button icon="arrow-to-right" data-testid='generate-button' onClick={_ => generate()}>Generate</Button>
           <Button className={s.marginLeft} icon="file-download" disabled={files.length === 0} onClick={_ => download()}>Download as zip</Button>
         </div>
 
