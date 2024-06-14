@@ -43,7 +43,7 @@ export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
       {
         Object.keys(grouped).sort().map((category: string) =>
           <>
-            <>{category}</>
+            <span className={s.category}>{category}</span>
             {grouped[category].map((type: ResourceType, i: number) => { return <Checkbox className={s.checkbox} key={type.name} checked={type.selected} label={type.name} onChange={(e) => { updateResourceTypes(type.name) }} /> })}
             <br />
           </>
@@ -56,6 +56,14 @@ const getStyles = (theme: GrafanaTheme2) => ({
   checkbox: css`
       margin-left: ${theme.spacing(2)};
     `,
+  category: css`
+      display: inline-block;
+      width: 150px;
+  `,
+  resourceTypes: css`
+      float: left;
+      overflow: hidden;
+  `,
   resourceTypeSelector: css`
       position: relative;
       top: -24px;
