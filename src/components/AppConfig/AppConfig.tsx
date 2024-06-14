@@ -3,12 +3,13 @@ import { lastValueFrom } from 'rxjs';
 import { css } from '@emotion/css';
 import { AppPluginMeta, GrafanaTheme2, KeyValue, PluginConfigPageProps, PluginMeta } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
-import { Button, Field, FieldSet, Input, SecretInput, useStyles2 } from '@grafana/ui';
+import { Button, Checkbox, Field, FieldSet, Input, SecretInput, useStyles2 } from '@grafana/ui';
 import { testIds } from '../testIds';
 
 export type AppPluginSettings = {
   grafanaUrl?: string;
   serviceAccountToken?: string;
+  grafanaIsCloudStack?: boolean;
   smUrl?: string;
   smToken?: string;
   oncallUrl?: string;
@@ -20,6 +21,7 @@ export type AppPluginSettings = {
 type State = {
   grafanaUrl: string;
   serviceAccountToken: string;
+  grafanaIsCloudStack: boolean;
   smUrl: string;
   smToken: string;
   oncallUrl: string;
@@ -41,6 +43,7 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
   const [state, setState] = useState<State>({
     grafanaUrl: jsonData?.grafanaUrl || '',
     serviceAccountToken: '',
+    grafanaIsCloudStack: jsonData?.grafanaIsCloudStack || false,
     smUrl: jsonData?.smUrl || '',
     smToken: '',
     oncallUrl: jsonData?.oncallUrl || '',
@@ -103,6 +106,18 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
           />
         </Field>
 
+        <Field label="Is Cloud Stack" description="Is this a cloud stack?">
+          <Checkbox label="Is Cloud Stack"
+            name="grafanaIsCloudStack"
+            checked={state.grafanaIsCloudStack}
+            onChange={(event) => {
+              setState({
+                ...state,
+                grafanaIsCloudStack: event.currentTarget.checked,
+              });
+            }}
+          />
+        </Field>
 
         <Field label="Service Account Token" description="A service account token.">
           <SecretInput
@@ -215,6 +230,7 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
                 jsonData: {
                   grafanaUrl: state.grafanaUrl,
                   cloudOrg: state.cloudOrg,
+                  grafanaIsCloudStack: state.grafanaIsCloudStack,
                   smUrl: state.smUrl,
                   oncallUrl: state.oncallUrl,
                 },
@@ -224,16 +240,12 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
               })
             }
             }
-            disabled={Boolean(!state.grafanaUrl ||
-              (!state.isServiceAccountTokenSet && !state.serviceAccountToken) ||
-              !state.cloudOrg ||
-              (!state.isCloudAccessPolicyTokenSet && !state.cloudAccessPolicyToken))}
           >
             Save API settings
           </Button>
         </div>
-      </FieldSet>
-    </div>
+      </FieldSet >
+    </div >
   );
 };
 

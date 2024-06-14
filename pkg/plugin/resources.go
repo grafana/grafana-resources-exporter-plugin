@@ -104,6 +104,9 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 				genConfig.Grafana.OnCallURL = a.config.JSONData.OnCallURL
 				genConfig.Grafana.OnCallAccessToken = a.config.SecureJSONData.OnCallToken
 			}
+			if a.config.JSONData.GrafanaIsCloudStack {
+				genConfig.Grafana.IsGrafanaCloudStack = true
+			}
 		}
 
 		if err := tfgenerate.Generate(req.Context(), genConfig); err != nil {
@@ -134,7 +137,8 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 }
 
 type resource struct {
-	Name string `json:"name"`
+	Name     string `json:"name"`
+	Category string `json:"category"`
 }
 
 type resourceTypesResponse struct {
@@ -179,16 +183,20 @@ func (a *App) handleResourceTypes(w http.ResponseWriter, req *http.Request) {
 				switch string(r.Category) {
 				case "Synthetic Monitoring":
 					if a.config.SecureJSONData.SMToken != "" {
-						resources = append(resources, resource{Name: r.Name})
+						resources = append(resources, resource{Name: r.Name, Category: string(r.Category)})
 					}
 				case "OnCall":
 					if a.config.SecureJSONData.OnCallToken != "" {
-						resources = append(resources, resource{Name: r.Name})
+						resources = append(resources, resource{Name: r.Name, Category: string(r.Category)})
 					}
-				case "Cloud", "Machine Learning", "SLO":
+				case "Machine Learning", "SLO":
+					if a.config.JSONData.GrafanaIsCloudStack {
+						resources = append(resources, resource{Name: r.Name, Category: string(r.Category)})
+					}
+				case "Cloud":
 					continue
 				default:
-					resources = append(resources, resource{Name: r.Name})
+					resources = append(resources, resource{Name: r.Name, Category: string(r.Category)})
 				}
 			}
 		}

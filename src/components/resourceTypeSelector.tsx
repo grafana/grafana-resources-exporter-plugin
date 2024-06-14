@@ -5,15 +5,15 @@ import { css } from '@emotion/css';
 import { ResourceType } from '../types/resourceTypes'
 
 interface ResourceTypeSelectorProps {
-    resourceTypes: ResourceType[]
-    onChange: any
+  resourceTypes: ResourceType[]
+  onChange: any
 }
 
 export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
   const s = useStyles2(getStyles);
-  const updateResourceTypes = (i: number) => {
-    const updatedResourceTypes: ResourceType[] = props.resourceTypes.map((item, index)=> {
-      if (index === i) {
+  const updateResourceTypes = (name: string) => {
+    const updatedResourceTypes: ResourceType[] = props.resourceTypes.map((item, index) => {
+      if (item.name === name) {
         item.selected = !item.selected
       }
       return item
@@ -21,37 +21,48 @@ export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
     props.onChange(updatedResourceTypes)
   }
   const setAllResourceTypes = (state: boolean) => {
-    const updatedResourceTypes: ResourceType[] = props.resourceTypes.map((item, index)=> {
+    const updatedResourceTypes: ResourceType[] = props.resourceTypes.map((item, index) => {
       item.selected = state
       return item
     })
     props.onChange(updatedResourceTypes)
   }
 
-  const sorted = props.resourceTypes.sort((a: ResourceType, b: ResourceType)=> (a.name.localeCompare(b.name)))
+  const grouped = props.resourceTypes.reduce(
+    (result: any, currentValue: any) => {
+      (result[currentValue['category']] = result[currentValue['category']] || []).push(currentValue);
+      result[currentValue['category']] = result[currentValue['category']].sort((a: ResourceType, b: ResourceType) => (a.name.localeCompare(b.name)));
+      return result;
+    }, {});
   return <div>
-            <div className={s.resourceTypeSelector}>
-            <Button size="sm" fill="text" onClick={_=>setAllResourceTypes(false)}>select none</Button>
-            <Button size="sm" fill="text" onClick={_=>setAllResourceTypes(true)}>select all</Button>
-            </div>
-            <div className={s.resourceTypeCheckbox}>
-              {
-                sorted.map((type: ResourceType, i: number) => {return <Checkbox className={s.checkbox} key={type.name} checked={type.selected} label={type.name} onChange={(e)=>{updateResourceTypes(i)}}/>})
-              }
-            </div>
-        </div>;
+    <div className={s.resourceTypeSelector}>
+      <Button size="sm" fill="text" onClick={_ => setAllResourceTypes(false)}>select none</Button>
+      <Button size="sm" fill="text" onClick={_ => setAllResourceTypes(true)}>select all</Button>
+    </div>
+    <div className={s.resourceTypeCheckbox}>
+      {
+        Object.keys(grouped).sort().map((category: string) =>
+          <>
+            <>{category}</>
+            {grouped[category].map((type: ResourceType, i: number) => { return <Checkbox className={s.checkbox} key={type.name} checked={type.selected} label={type.name} onChange={(e) => { updateResourceTypes(type.name) }} /> })}
+            <br />
+          </>
+        )
+      }
+    </div>
+  </div>;
 }
 const getStyles = (theme: GrafanaTheme2) => ({
-    checkbox: css`
+  checkbox: css`
       margin-left: ${theme.spacing(2)};
     `,
-    resourceTypeSelector: css`
+  resourceTypeSelector: css`
       position: relative;
       top: -24px;
       left: 100px;
     `,
-    resourceTypeCheckbox: css`
+  resourceTypeCheckbox: css`
       position: relative;
       top: -20px;
     `,
-  });
+});

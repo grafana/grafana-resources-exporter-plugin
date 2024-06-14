@@ -1,5 +1,6 @@
 export interface ResourceType {
     name: string
+    category: string
     selected: boolean
 }
 

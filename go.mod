@@ -8,9 +8,9 @@ toolchain go1.22.3
 replace github.com/hashicorp/terraform-exec v0.21.0 => github.com/hrmsk66/terraform-exec v0.21.0
 
 require (
-	github.com/grafana/grafana-plugin-sdk-go v0.232.0
+	github.com/grafana/grafana-plugin-sdk-go v0.235.0
 	github.com/grafana/grizzly v0.4.2
-	github.com/grafana/terraform-provider-grafana/v3 v3.1.1-0.20240613114524-7809a1213d6a
+	github.com/grafana/terraform-provider-grafana/v3 v3.1.1-0.20240614143200-f8d7983f180f
 )
 
 require (
@@ -61,8 +61,10 @@ require (
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/grafana/amixr-api-go-client v0.0.12-0.20240410110211-c9f68db085c4 // indirect
 	github.com/grafana/grafana-com-public-clients/go/gcom v0.0.0-20240322153219-42c6a1d2bcab // indirect
-	github.com/grafana/grafana-openapi-client-go v0.0.0-20240430202104-3ad0f7e4ee52 // indirect
-	github.com/grafana/machine-learning-go-client v0.5.0 // indirect
+	github.com/grafana/grafana-openapi-client-go v0.0.0-20240523010106-657d101fcbd9 // indirect
+	github.com/grafana/machine-learning-go-client v0.7.0 // indirect
+	github.com/grafana/otel-profiling-go v0.5.1 // indirect
+	github.com/grafana/pyroscope-go/godeltaprof v0.1.7 // indirect
 	github.com/grafana/slo-openapi-client/go v0.0.0-20240507015908-bf9e85638f2f // indirect
 	github.com/grafana/synthetic-monitoring-agent v0.24.1 // indirect
 	github.com/grafana/synthetic-monitoring-api-go-client v0.8.0 // indirect
@@ -97,7 +99,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f // indirect
-	github.com/klauspost/compress v1.17.0 // indirect
+	github.com/klauspost/compress v1.17.3 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/lucasb-eyer/go-colorful v1.0.3 // indirect
 	github.com/magefile/mage v1.15.0 // indirect
@@ -178,7 +180,7 @@ require (
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240415180920-8c6c420018be // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be // indirect
-	google.golang.org/grpc v1.63.2 // indirect
+	google.golang.org/grpc v1.64.0 // indirect
 	google.golang.org/protobuf v1.34.0 // indirect
 	gopkg.in/fsnotify.v1 v1.4.7 // indirect
 	gopkg.in/fsnotify/fsnotify.v1 v1.4.7 // indirect
