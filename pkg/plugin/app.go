@@ -26,10 +26,11 @@ var (
 )
 
 type JSONData struct {
-	GrafanaURL string `json:"grafanaUrl"`
-	SMURL      string `json:"smUrl"`
-	OnCallURL  string `json:"oncallUrl"`
-	CloudOrg   string `json:"cloudOrg"`
+	GrafanaURL          string `json:"grafanaUrl"`
+	GrafanaIsCloudStack bool   `json:"grafanaIsCloudStack"`
+	SMURL               string `json:"smUrl"`
+	OnCallURL           string `json:"oncallUrl"`
+	CloudOrg            string `json:"cloudOrg"`
 }
 
 type EncodedSecureJSONData struct {
