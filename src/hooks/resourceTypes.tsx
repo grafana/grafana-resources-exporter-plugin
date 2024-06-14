@@ -11,7 +11,6 @@ export const getResourceTypes = async (target: string, outputFormat: string, cal
             type.selected = true
             typeList.push(type)
         })
-        console.log("TYPES", typeList)
         callback(typeList)
     } catch (err) {
         console.log(err)
