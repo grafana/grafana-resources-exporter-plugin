@@ -32,6 +32,6 @@ describe('Components/App', () => {
       </BrowserRouter>
     );
 
-    expect(screen.queryByText(/Render your Grafana resources/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Generate/i)).toBeInTheDocument();
   });
 });
