@@ -131,7 +131,7 @@ export function ExportPage() {
           </Field>
         </div>
         <div>
-          <Button icon="arrow-to-right" onClick={_ => generate()}>Generate</Button>
+          <Button icon="arrow-to-right" data-testid='generate-button' onClick={_ => generate()}>Generate</Button>
           <Button className={s.marginLeft} icon="file-download" disabled={files.length === 0} onClick={_ => download()}>Download as zip</Button>
         </div>
 

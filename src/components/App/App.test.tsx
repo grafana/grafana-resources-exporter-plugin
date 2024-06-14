@@ -32,6 +32,6 @@ describe('Components/App', () => {
       </BrowserRouter>
     );
 
-    expect(screen.queryByText(/Generate/i)).toBeInTheDocument();
+    expect(screen.findByTestId('generate-button')).toBeInTheDocument();
   });
 });
