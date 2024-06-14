@@ -42,11 +42,13 @@ export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
     <div className={s.resourceTypeCheckbox}>
       {
         Object.keys(grouped).sort().map((category: string) =>
-          <>
-            <span className={s.category}>{category}</span>
-            {grouped[category].map((type: ResourceType, i: number) => { return <Checkbox className={s.checkbox} key={type.name} checked={type.selected} label={type.name} onChange={(e) => { updateResourceTypes(type.name) }} /> })}
+          <div key={category} className={s.row}>
+            <div className={s.category}>{category}</div>
+            <div className={s.resourceTypes}>
+              {grouped[category].map((type: ResourceType, i: number) => { return <Checkbox className={s.checkbox} key={type.name} checked={type.selected} label={type.name} onChange={(e) => { updateResourceTypes(type.name) }} /> })}
+            </div>
             <br />
-          </>
+          </div>
         )
       }
     </div>
@@ -56,13 +58,16 @@ const getStyles = (theme: GrafanaTheme2) => ({
   checkbox: css`
       margin-left: ${theme.spacing(2)};
     `,
+  row: css`
+    display: table-row;
+  `,
   category: css`
-      display: inline-block;
+      display: table-cell;
       width: 150px;
+      padding-bottom: ${theme.spacing(1)};
   `,
   resourceTypes: css`
-      float: left;
-      overflow: hidden;
+      display: table-cell;
   `,
   resourceTypeSelector: css`
       position: relative;
@@ -72,5 +77,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
   resourceTypeCheckbox: css`
       position: relative;
       top: -20px;
+      display: table;
     `,
 });
