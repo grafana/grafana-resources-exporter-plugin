@@ -43,20 +43,22 @@ export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
       {
         Object.keys(grouped).sort().map((category: string) =>
           <div key={category} className={s.row}>
-            <div className={s.category}>{category}</div>
+            {Object.keys(grouped).length > 1 && <div className={s.category}>{category}</div>}
             <div className={s.resourceTypes}>
-              {grouped[category].map((type: ResourceType, i: number) => { return <Checkbox className={s.checkbox} key={type.name} checked={type.selected} label={type.name} onChange={(e) => { updateResourceTypes(type.name) }} /> })}
+              {grouped[category].map((type: ResourceType, i: number) => {
+                return <Checkbox className={s.checkbox} key={type.name} checked={type.selected} label={type.name} onChange={(e) => { updateResourceTypes(type.name) }} />
+              })}
             </div>
             <br />
           </div>
         )
       }
     </div>
-  </div>;
+  </div >;
 }
 const getStyles = (theme: GrafanaTheme2) => ({
   checkbox: css`
-      margin-left: ${theme.spacing(2)};
+      margin-right: ${theme.spacing(2)};
     `,
   row: css`
     display: table-row;
