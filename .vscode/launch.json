@@ -8,7 +8,9 @@
       "mode": "debug",
       "program": "${workspaceFolder}/pkg",
       "env": {},
-      "args": ["-standalone"]
+      "args": [
+        "-standalone"
+      ]
     },
     {
       "name": "Attach to plugin backend in docker",
@@ -23,7 +25,7 @@
       "substitutePath": [
         {
           "from": "${workspaceFolder}",
-          "to": "/root/grafana-grafanaascode-app"
+          "to": "/root/grafana-resourcesexporter-app"
         }
       ]
     }
