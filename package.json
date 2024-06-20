@@ -63,7 +63,7 @@
     "@grafana/data": "10.3.3",
     "@grafana/runtime": "10.3.3",
     "@grafana/schema": "10.3.3",
-    "@grafana/ui": "10.3.3",
+    "@grafana/ui": "11.0.0",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
     "react": "18.2.0",
