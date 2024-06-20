@@ -1,7 +1,7 @@
 apiVersion: 1
 
 apps:
-  - type: 'grafana-catplugin-app'
+  - type: 'grafana-resourcesexporter-app'
     org_id: 1
     org_name: 'grafana'
     disabled: false

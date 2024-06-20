@@ -1,6 +1,6 @@
 {
-  "name": "grafana-cat-plugin",
-  "version": "1.0.0",
+  "name": "grafana-resources-exporter",
+  "version": "0.0.1",
   "description": "",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",

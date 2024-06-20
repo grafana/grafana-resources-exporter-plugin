@@ -1,4 +1,4 @@
-module github.com/grafana/grafana-cat-plugin
+module github.com/grafana/grafana-resources-exporter-plugin
 
 go 1.22
 
