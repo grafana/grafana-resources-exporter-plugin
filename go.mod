@@ -8,7 +8,7 @@ toolchain go1.22.3
 replace github.com/hashicorp/terraform-exec v0.21.0 => github.com/hrmsk66/terraform-exec v0.21.0
 
 require (
-	github.com/grafana/grafana-plugin-sdk-go v0.235.0
+	github.com/grafana/grafana-plugin-sdk-go v0.236.0
 	github.com/grafana/grizzly v0.4.2
 	github.com/grafana/terraform-provider-grafana/v3 v3.1.1-0.20240614143200-f8d7983f180f
 )
@@ -125,9 +125,9 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/prometheus/client_golang v1.19.0 // indirect
+	github.com/prometheus/client_golang v1.19.1 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.53.0 // indirect
+	github.com/prometheus/common v0.54.0 // indirect
 	github.com/prometheus/procfs v0.14.0 // indirect
 	github.com/rivo/tview v0.0.0-20200818120338-53d50e499bf9 // indirect
 	github.com/rivo/uniseg v0.1.0 // indirect
