@@ -56,6 +56,7 @@ export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
     </div>
   </div >;
 }
+
 const getStyles = (theme: GrafanaTheme2) => ({
   checkbox: css`
       margin-right: ${theme.spacing(2)};
