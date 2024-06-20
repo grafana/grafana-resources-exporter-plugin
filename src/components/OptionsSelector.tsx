@@ -44,9 +44,8 @@ export function OptionsSelector(props: OptionsSelectorProps) {
   }, [target, format])
 
   useEffect(() => {
-    console.log("GETTING RESOURCE TYPES")
-    getResourceTypes(target, format, setResourceTypes)
-  }, [target, format]);
+    getResourceTypes(target, format, resourceTypes, setResourceTypes)
+  }, [target, format, resourceTypes]);
 
   useEffect(() => {
     if (resourceTypes.filter(r => r.selected).length === 0) {
