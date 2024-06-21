@@ -27,9 +27,20 @@ export function ExportPage() {
     const topHeight = currentTopRef.clientHeight;
 
     // 215 is an estimate of the height of Grafana's header
-    setEditorHeight(window.innerHeight - 215 - topHeight)
+    setEditorHeight(Math.max(window.innerHeight - 220 - topHeight, 300))
   }
   useEffect(reloadEditorHeight, [topRef, optionsCollapsed, loading]);
+
+  // Register the resize event listener only once
+  const [resizeRegistered, setResizeRegistered] = useState(false)
+  useEffect(() => {
+    if (resizeRegistered) {
+      return;
+    }
+    setResizeRegistered(true);
+    console.log('registering resize event listener')
+    window.addEventListener('resize', reloadEditorHeight);
+  }, [resizeRegistered])
 
   let content: React.ReactNode
 
