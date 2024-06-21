@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import { PluginPage, getBackendSrv } from '@grafana/runtime';
 import { useStyles2, ErrorWithStack, Spinner, Button } from '@grafana/ui';
-import { testIds } from '../components/testIds';
 import { GeneratedFile, GenerateRequest, GenerateResponse } from "../types/generator";
 import { saveAs } from 'file-saver';
 import JSZip from "jszip";
@@ -20,6 +19,18 @@ export function ExportPage() {
   const [options, setOptions] = useState<GenerateRequest | undefined>(undefined)
   const [optionsCollapsed, setOptionsCollapsed] = useState(false)
 
+  // Set the height of the editor to fill the remaining space
+  const topRef = useRef(null)
+  const [editorHeight, setEditorHeight] = useState(0)
+  const reloadEditorHeight = () => {
+    const currentTopRef = topRef.current as unknown as HTMLElement;
+    const topHeight = currentTopRef.clientHeight;
+
+    // 215 is an estimate of the height of Grafana's header
+    setEditorHeight(window.innerHeight - 215 - topHeight)
+  }
+  useEffect(reloadEditorHeight, [topRef, optionsCollapsed, loading]);
+
   let content: React.ReactNode
 
   if (error) {
@@ -33,7 +44,7 @@ export function ExportPage() {
       <p>Once you have generated your resources, you can download them all as a zip file.</p>
     </div>
   } else {
-    content = <ResultViewer files={files} />
+    content = <ResultViewer height={editorHeight + 'px'} files={files} />
   }
   const generate = async () => {
     setLoading(true)
@@ -67,32 +78,29 @@ export function ExportPage() {
   };
   return (
     <PluginPage>
-      <div data-testid={testIds.exportPage.container}>
+      <div ref={topRef}>
         <OptionsSelector onChange={setOptions} className={optionsCollapsed ? s.displayNone : ""} />
-        <div>
-          <Button icon="arrow-to-right" data-testid='generate-button' onClick={_ => { setOptionsCollapsed(true); generate(); }} disabled={options === undefined}>Generate</Button>
-          <Button className={s.marginLeft} icon="file-download" disabled={files.length === 0} onClick={_ => download()}>Download as zip</Button>
-          <Button className={s.marginLeft} icon={optionsCollapsed ? "angle-double-down" : "angle-double-up"} onClick={_ => setOptionsCollapsed(!optionsCollapsed)}>{optionsCollapsed ? "Show options" : "Hide options"}</Button>
-        </div>
-
-        {content}
+        <Button icon="arrow-to-right" data-testid='generate-button' onClick={_ => { setOptionsCollapsed(true); generate(); reloadEditorHeight(); }} disabled={options === undefined}>Generate</Button>
+        <Button className={s.marginLeft} icon="file-download" disabled={files.length === 0} onClick={_ => download()}>Download as zip</Button>
+        <Button className={s.marginLeft} icon={optionsCollapsed ? "angle-double-down" : "angle-double-up"} onClick={_ => { setOptionsCollapsed(!optionsCollapsed); }}>{optionsCollapsed ? "Show options" : "Hide options"}</Button>
       </div>
+      {content}
     </PluginPage >
   );
 }
 
 const getStyles = (theme: GrafanaTheme2) => ({
   displayNone: css`
-    display: none;
-  `,
+      display: none;
+      `,
   marginTop: css`
-    margin-top: ${theme.spacing(2)};
-  `,
+      margin-top: ${theme.spacing(2)};
+      `,
   marginLeft: css`
-    margin-left: ${theme.spacing(2)};
-  `,
+      margin-left: ${theme.spacing(2)};
+      `,
   margin: css`
-    margin-left: ${theme.spacing(2)};
-    margin-right: ${theme.spacing(2)};
-  `,
+      margin-left: ${theme.spacing(2)};
+      margin-right: ${theme.spacing(2)};
+      `,
 });
