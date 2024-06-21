@@ -6,7 +6,7 @@ import { ResourceType } from '../types/resourceTypes'
 
 interface ResourceTypeSelectorProps {
   resourceTypes: ResourceType[]
-  onChange: any
+  onChange: (resourceTypes: ResourceType[]) => void
 }
 
 export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
@@ -29,9 +29,10 @@ export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
   }
 
   const grouped = props.resourceTypes.reduce(
-    (result: any, currentValue: any) => {
-      (result[currentValue['category']] = result[currentValue['category']] || []).push(currentValue);
-      result[currentValue['category']] = result[currentValue['category']].sort((a: ResourceType, b: ResourceType) => (a.name.localeCompare(b.name)));
+    (result: Record<string, ResourceType[]>, currentValue: ResourceType) => {
+      const categoryResult = result[currentValue.category] || [];
+      categoryResult.push(currentValue);
+      result[currentValue.category] = categoryResult.sort((a: ResourceType, b: ResourceType) => (a.name.localeCompare(b.name)));
       return result;
     }, {});
   return <div>

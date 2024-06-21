@@ -210,7 +210,7 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
             type="submit"
             data-testid={testIds.appConfig.submit}
             onClick={() => {
-              const secureJsonData: KeyValue<any> = {};
+              const secureJsonData: KeyValue<string> = {};
               if (!state.isServiceAccountTokenSet) {
                 secureJsonData.serviceAccountToken = state.serviceAccountToken;
               }
