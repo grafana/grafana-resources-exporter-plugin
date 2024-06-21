@@ -3,6 +3,12 @@ export interface GeneratedFile {
     content: string
 }
 
+export interface GenerateRequest {
+    target: string
+    outputFormat: string
+    onlyResources: string[]
+}
+
 export interface GenerateResponse {
     files: GeneratedFile[];
 }
