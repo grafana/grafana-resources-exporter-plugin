@@ -12,3 +12,12 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      # These all follow the same Grafana versioning
+      grafana:
+        patterns:
+          - "@grafana/data"
+          - "@grafana/runtime"
+          - "@grafana/schema"
+          - "@grafana/ui"
+        applies-to: version-updates
