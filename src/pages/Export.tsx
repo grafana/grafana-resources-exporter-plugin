@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
-import { PluginPage, getBackendSrv } from '@grafana/runtime';
+import { PluginPage, getBackendSrv, isFetchError } from '@grafana/runtime';
 import { useStyles2, ErrorWithStack, Spinner, Button } from '@grafana/ui';
 import { GeneratedFile, GenerateRequest, GenerateResponse } from "../types/generator";
 import { saveAs } from 'file-saver';
@@ -15,7 +15,7 @@ export function ExportPage() {
 
   const [files, setFiles] = useState<GeneratedFile[]>([])
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<Error | undefined>(undefined)
+  const [error, setError] = useState<{ title: string, error: Error, info: React.ErrorInfo | null } | undefined>(undefined)
   const [options, setOptions] = useState<GenerateRequest | undefined>(undefined)
   const [optionsCollapsed, setOptionsCollapsed] = useState(false)
 
@@ -29,7 +29,7 @@ export function ExportPage() {
     // 215 is an estimate of the height of Grafana's header
     setEditorHeight(Math.max(window.innerHeight - 220 - topHeight, 300))
   }
-  useEffect(reloadEditorHeight, [topRef, optionsCollapsed, loading]);
+  useEffect(reloadEditorHeight, [topRef, optionsCollapsed, loading, options]);
 
   // Register the resize event listener only once
   const [resizeRegistered, setResizeRegistered] = useState(false)
@@ -45,7 +45,7 @@ export function ExportPage() {
   let content: React.ReactNode
 
   if (error) {
-    content = <ErrorWithStack error={error} title={'Unexpected error'} errorInfo={null} />;
+    content = <ErrorWithStack title={error.title} error={error.error} errorInfo={error.info} />;
   } else if (loading) {
     content = <Spinner size={"xxl"} className={s.marginTop} />;
   } else if (files?.length === 0) {
@@ -60,13 +60,15 @@ export function ExportPage() {
   const generate = async () => {
     setLoading(true)
     try {
-      const exports = await getBackendSrv().post<GenerateResponse>(`api/plugins/${pluginJson.id}/resources/generate`, options);
-      setFiles(exports.files)
+      const exports = await getBackendSrv().post<GenerateResponse>(`api/plugins/${pluginJson.id}/resources/generate`, options, { showErrorAlert: false });
+      setFiles(exports.files || [{ name: "Result", content: "No resources were found" }])
     } catch (err) {
       if (err instanceof Error) {
-        setError(err)
+        setError({ title: err.message, error: err, info: null })
+      } else if (isFetchError(err)) {
+        setError({ title: err.statusText!, error: new Error(err.data?.message), info: null })
       } else {
-        setError(new Error(`${err}`))
+        setError({ title: "Unexpected Error", error: new Error(`${err}`), info: null })
       }
     }
     setLoading(false)
