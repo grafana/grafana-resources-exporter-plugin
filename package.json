@@ -1,5 +1,5 @@
 {
-  "name": "grafana-resources-exporter",
+  "name": "grafana-resources-exporter-app",
   "version": "0.0.1",
   "description": "Export resources from your instance or Granana Cloud account as Terraform, Grizzly or Crossplane resource definitions.",
   "scripts": {
