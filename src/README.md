@@ -1,49 +1,24 @@
-<!-- This README file is going to be the one displayed on the Grafana.com website for your plugin. Uncomment and replace the content here before publishing.
-
-Remove any remaining comments before publishing as these may be displayed on Grafana.com -->
-
 # Grafana Resources Exporter
 
-<!-- To help maximize the impact of your README and improve usability for users, we propose the following loose structure:
+The resources exporter is a Grafana App Plugin that allows users to export resources from their instance or Grafana Cloud account as Terraform, Grizzly or Crossplane resource definitions.
 
-**BEFORE YOU BEGIN**
-- Ensure all links are absolute URLs so that they will work when the README is displayed within Grafana and Grafana.com
-- Be inspired ✨
-  - [grafana-polystat-panel](https://github.com/grafana/grafana-polystat-panel)
-  - [volkovlabs-variable-panel](https://github.com/volkovlabs/volkovlabs-variable-panel)
+## Maturity
 
-**ADD SOME BADGES**
+> _The code in this folder should be considered experimental. Documentation is only
+available alongside the code. It comes with no support, but we are keen to receive
+feedback on the product and suggestions on how to improve it, though we cannot commit
+to resolution of any particular issue. No SLAs are available. It is not meant to be used
+in production environments, and the risks are unknown/high._
 
-Badges convey useful information at a glance for users whether in the Catalog or viewing the source code. You can use the generator on [Shields.io](https://shields.io/badges/dynamic-json-badge) together with the Grafana.com API
-to create dynamic badges that update automatically when you publish a new version to the marketplace.
+Grafana Labs defines experimental features as follows:
 
-- For the logo field use 'grafana'.
-- Examples (label: query)
-  - Downloads: $.downloads
-  - Catalog Version: $.version
-  - Grafana Dependency: $.grafanaDependency
-  - Signature Type: $.versionSignatureType
-
-Full example: ![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?logo=grafana&query=$.version&url=https://grafana.com/api/plugins/grafana-polystat-panel&label=Marketplace&prefix=v&color=F47A20)
-
-Consider other [badges](https://shields.io/badges) as you feel appropriate for your project.
-
-## Overview / Introduction
-Provide one or more paragraphs as an introduction to your plugin to help users understand why they should use it.
-
-Consider including screenshots:
-- in [plugin.json](https://grafana.com/developers/plugin-tools/reference/plugin-json#info) include them as relative links.
-- in the README ensure they are absolute URLs.
-
-## Requirements
-List any requirements or dependencies they may need to run the plugin.
-
-## Getting Started
-Provide a quick start on how to configure and use the plugin.
-
-## Documentation
-If your project has dedicated documentation available for users, provide links here. For help in following Grafana's style recommendations for technical documentation, refer to our [Writer's Toolkit](https://grafana.com/docs/writers-toolkit/).
-
-## Contributing
-Do you want folks to contribute to the plugin or provide feedback through specific means? If so, tell them how!
--->
+> Projects and features in the Experimental stage are supported only by the Engineering
+teams; on-call support is not available. Documentation is either limited or not provided
+outside of code comments. No SLA is provided.
+>
+> Experimental projects or features are primarily intended for open source engineers who
+want to participate in ensuring systems stability, and to gain consensus and approval
+for open source governance projects.
+>
+> Projects and features in the Experimental phase are not meant to be used in production
+environments, and the risks are unknown/high.

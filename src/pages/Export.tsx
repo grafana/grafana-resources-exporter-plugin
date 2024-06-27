@@ -93,7 +93,7 @@ export function ExportPage() {
     <PluginPage>
       <div ref={topRef}>
         <OptionsSelector onChange={setOptions} className={optionsCollapsed ? s.displayNone : ""} />
-        <Button icon="arrow-to-right" data-testid='generate-button' onClick={_ => { setOptionsCollapsed(true); generate(); reloadEditorHeight(); }} disabled={options === undefined}>Generate</Button>
+        <Button icon="arrow-to-right" onClick={_ => { setOptionsCollapsed(true); generate(); reloadEditorHeight(); }} disabled={options === undefined}>Generate</Button>
         <Button className={s.marginLeft} icon="file-download" disabled={files.length === 0} onClick={_ => download()}>Download as zip</Button>
         <Button className={s.marginLeft} icon={optionsCollapsed ? "angle-double-down" : "angle-double-up"} onClick={_ => { setOptionsCollapsed(!optionsCollapsed); }}>{optionsCollapsed ? "Show options" : "Hide options"}</Button>
       </div>

@@ -4,7 +4,6 @@ import { css } from '@emotion/css';
 import { AppPluginMeta, GrafanaTheme2, KeyValue, PluginConfigPageProps, PluginMeta } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
 import { Button, Checkbox, Field, FieldSet, Input, SecretInput, useStyles2 } from '@grafana/ui';
-import { testIds } from '../testIds';
 
 export type AppPluginSettings = {
   grafanaUrl?: string;
@@ -92,14 +91,13 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
   };
 
   return (
-    <div data-testid={testIds.appConfig.container}>
+    <div>
       <FieldSet label="API Settings">
         <Field label="Grafana Url" description="" className={s.marginTop}>
           <Input
             width={60}
             name="grafanaUrl"
             id="config-api-url"
-            data-testid={testIds.appConfig.grafanaUrl}
             value={state.grafanaUrl}
             placeholder={`E.g.: https://my-grafana-instance.com`}
             onChange={onChange}
@@ -123,7 +121,6 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
           <SecretInput
             width={60}
             id="config-service-account-token"
-            data-testid={testIds.appConfig.serviceAccountToken}
             name="serviceAccountToken"
             value={state.serviceAccountToken}
             isConfigured={state.isServiceAccountTokenSet}
@@ -208,7 +205,6 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
         <div className={s.marginTop}>
           <Button
             type="submit"
-            data-testid={testIds.appConfig.submit}
             onClick={() => {
               const secureJsonData: KeyValue<string> = {};
               if (!state.isServiceAccountTokenSet) {
