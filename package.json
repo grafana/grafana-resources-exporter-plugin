@@ -1,7 +1,7 @@
 {
   "name": "grafana-resources-exporter",
   "version": "0.0.1",
-  "description": "",
+  "description": "Export resources from your instance or Granana Cloud account as Terraform, Grizzly or Crossplane resource definitions.",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
     "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
@@ -10,7 +10,6 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint --cache --ignore-path ./.gitignore --ext .js,.jsx,.ts,.tsx .",
     "lint:fix": "npm run lint -- --fix",
-    "e2e": "playwright test",
     "server": "docker-compose up --build",
     "sign": "npx --yes @grafana/sign-plugin@latest"
   },
@@ -19,7 +18,6 @@
   "devDependencies": {
     "@babel/core": "^7.24.7",
     "@grafana/eslint-config": "^7.0.0",
-    "@grafana/plugin-e2e": "^1.6.0",
     "@grafana/plugin-meta-extractor": "^0.0.3",
     "@grafana/tsconfig": "^1.2.0-rc1",
     "@playwright/test": "^1.45.0",
@@ -73,5 +71,5 @@
     "rxjs": "7.8.1",
     "tslib": "2.6.3"
   },
-  "packageManager": "npm@10.5.0"
+  "packageManager": "yarn@1.22.22"
 }
