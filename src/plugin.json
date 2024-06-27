@@ -7,11 +7,17 @@
   "executable": "gpx_grafana_cat_plugin",
   "info": {
     "keywords": [
-      "app"
+      "app",
+      "terraform",
+      "crossplane",
+      "grizzly",
+      "as-code",
+      "export"
     ],
-    "description": "",
+    "description": "Export resources from your instance or Granana Cloud account as Terraform, Grizzly or Crossplane resource definitions.",
     "author": {
-      "name": "Grafana"
+      "name": "Grafana Labs",
+      "url": "https://grafana.com"
     },
     "logos": {
       "small": "img/logo.svg",
