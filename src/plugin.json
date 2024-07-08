@@ -4,6 +4,7 @@
   "name": "Grafana Resources Exporter",
   "id": "grafana-resourcesexporter-app",
   "backend": true,
+  "preload": true,
   "executable": "gpx_grafana_cat_plugin",
   "info": {
     "keywords": [
@@ -14,7 +15,7 @@
       "as-code",
       "export"
     ],
-    "description": "Export resources from your instance or Granana Cloud account as Terraform, Grizzly or Crossplane resource definitions.",
+    "description": "Export resources from your instance or Grafana Cloud account as Terraform, Grizzly or Crossplane resource definitions.",
     "author": {
       "name": "Grafana Labs",
       "url": "https://grafana.com"
@@ -45,6 +46,13 @@
       "addToNav": true
     }
   ],
+  "iam": {
+    "permissions": [
+      {
+        "action": "viewer"
+      }
+    ]
+  },
   "dependencies": {
     "grafanaDependency": ">=10.3.3",
     "plugins": []
