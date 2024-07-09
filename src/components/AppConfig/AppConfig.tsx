@@ -1,94 +1,89 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { useState } from 'react';
 import { lastValueFrom } from 'rxjs';
 import { css } from '@emotion/css';
-import { AppPluginMeta, GrafanaTheme2, KeyValue, PluginConfigPageProps, PluginMeta } from '@grafana/data';
+import { GrafanaTheme2, KeyValue, PluginMeta } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
 import { Button, Checkbox, Field, FieldSet, Input, SecretInput, useStyles2 } from '@grafana/ui';
+import { ExporterPluginConfigPageProps, ExporterPluginMetaJSONData, ExporterPluginMetaSecureJSONData } from 'types/pluginData';
 
-export type AppPluginSettings = {
-  grafanaUrl?: string;
-  serviceAccountToken?: string;
-  grafanaIsCloudStack?: boolean;
-  smUrl?: string;
-  smToken?: string;
-  oncallUrl?: string;
-  oncallToken?: string;
-  cloudOrg?: string;
-  cloudAccessPolicyToken?: string;
-};
 
 type State = {
-  grafanaUrl: string;
-  serviceAccountToken: string;
-  grafanaIsCloudStack: boolean;
-  smUrl: string;
-  smToken: string;
-  oncallUrl: string;
-  oncallToken: string;
-  cloudOrg: string;
-  cloudAccessPolicyToken: string;
-
-  isServiceAccountTokenSet: boolean;
-  isSMTokenSet: boolean;
-  isOnCallTokenSet: boolean;
-  isCloudAccessPolicyTokenSet: boolean;
+  jsonData: ExporterPluginMetaJSONData;
+  secureJsonData: ExporterPluginMetaSecureJSONData;
+  secureJsonDataSet: KeyValue<boolean>;
 };
 
-export interface AppConfigProps extends PluginConfigPageProps<AppPluginMeta<AppPluginSettings>> { }
+interface Props extends ExporterPluginConfigPageProps { }
 
-export const AppConfig = ({ plugin }: AppConfigProps) => {
+export const AppConfig = ({ plugin }: Props) => {
   const s = useStyles2(getStyles);
   const { enabled, pinned, jsonData, secureJsonFields } = plugin.meta;
   const [state, setState] = useState<State>({
-    grafanaUrl: jsonData?.grafanaUrl || '',
-    serviceAccountToken: '',
-    grafanaIsCloudStack: jsonData?.grafanaIsCloudStack || false,
-    smUrl: jsonData?.smUrl || '',
-    smToken: '',
-    oncallUrl: jsonData?.oncallUrl || '',
-    oncallToken: '',
-    cloudOrg: jsonData?.cloudOrg || '',
-    cloudAccessPolicyToken: '',
-    isServiceAccountTokenSet: Boolean(secureJsonFields?.serviceAccountToken),
-    isSMTokenSet: Boolean(secureJsonFields?.smToken),
-    isOnCallTokenSet: Boolean(secureJsonFields?.oncallToken),
-    isCloudAccessPolicyTokenSet: Boolean(secureJsonFields?.cloudAccessPolicyToken),
+    jsonData: jsonData || {
+      grafanaUrl: '',
+      grafanaIsCloudStack: false,
+      smUrl: '',
+      oncallUrl: '',
+      cloudOrg: '',
+    },
+    secureJsonData: {
+      grafanaServiceAccountToken: '',
+      smToken: '',
+      oncallToken: '',
+      cloudAccessPolicyToken: '',
+    },
+    secureJsonDataSet: secureJsonFields || {},
   });
 
-  const onResetApiKey = () =>
-    setState({
-      ...state,
-      serviceAccountToken: '',
-      isServiceAccountTokenSet: false,
-    });
+  function baseInputProps<T>(key: keyof ExporterPluginMetaJSONData) {
+    return {
+      id: "config-" + key,
+      name: key as string,
+      value: state.jsonData[key] as T,
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        setState({
+          ...state,
+          jsonData: {
+            ...state.jsonData,
+            [event.target.name]: event.target.value,
+          },
+        })
+      },
+    }
+  }
 
-  const onResetAccessPolicyToken = () =>
-    setState({
-      ...state,
-      cloudAccessPolicyToken: '',
-      isCloudAccessPolicyTokenSet: false,
-    });
+  function baseSecretInputProps(key: keyof ExporterPluginMetaSecureJSONData) {
+    return {
+      id: "config-" + key,
+      name: key as string,
+      width: 60,
+      value: state.secureJsonData[key],
+      isConfigured: state.secureJsonDataSet[key],
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        setState({
+          ...state,
+          secureJsonData: {
+            ...state.secureJsonData,
+            [event.target.name]: event.target.value,
+          },
+        });
+      },
+      onReset: () => {
+        setState({
+          ...state,
+          secureJsonData: {
+            ...state.secureJsonData,
+            [key]: '',
+          },
+          secureJsonDataSet: {
+            ...state.secureJsonDataSet,
+            [key]: false,
+          }
+        });
+      },
+    };
+  }
 
-  const onResetSMToken = () =>
-    setState({
-      ...state,
-      smToken: '',
-      isSMTokenSet: false,
-    });
-
-  const onResetOncallToken = () =>
-    setState({
-      ...state,
-      oncallToken: '',
-      isOnCallTokenSet: false,
-    });
-
-  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setState({
-      ...state,
-      [event.target.name]: event.target.value.trim(),
-    });
-  };
 
   return (
     <div>
@@ -96,22 +91,22 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
         <Field label="Grafana Url" description="" className={s.marginTop}>
           <Input
             width={60}
-            name="grafanaUrl"
-            id="config-api-url"
-            value={state.grafanaUrl}
             placeholder={`E.g.: https://my-grafana-instance.com`}
-            onChange={onChange}
+            {...baseInputProps('grafanaUrl')}
           />
         </Field>
 
         <Field label="Is Cloud Stack" description="Is this a cloud stack?">
           <Checkbox label="Is Cloud Stack"
             name="grafanaIsCloudStack"
-            checked={state.grafanaIsCloudStack}
+            checked={state.jsonData.grafanaIsCloudStack}
             onChange={(event) => {
               setState({
                 ...state,
-                grafanaIsCloudStack: event.currentTarget.checked,
+                jsonData: {
+                  ...state.jsonData,
+                  grafanaIsCloudStack: event.currentTarget.checked,
+                },
               });
             }}
           />
@@ -119,86 +114,53 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
 
         <Field label="Service Account Token" description="A service account token.">
           <SecretInput
-            width={60}
-            id="config-service-account-token"
-            name="serviceAccountToken"
-            value={state.serviceAccountToken}
-            isConfigured={state.isServiceAccountTokenSet}
             placeholder={'Your service account token'}
-            onChange={onChange}
-            onReset={onResetApiKey}
+            {...baseSecretInputProps('grafanaServiceAccountToken')}
           />
         </Field>
 
         <Field label="SM Url" description="" className={s.marginTop}>
           <Input
             width={60}
-            name="smUrl"
-            id="config-sm-url"
-            value={state.smUrl}
             placeholder={`E.g.: https://my-sm-instance.com`}
-            onChange={onChange}
+            {...baseInputProps('smUrl')}
           />
         </Field>
 
         <Field label="SM Token" description="">
           <SecretInput
-            width={60}
-            id="config-sm-token"
-            name="smToken"
-            value={state.smToken}
             placeholder={'Your SM token'}
-            onChange={onChange}
-            isConfigured={state.isSMTokenSet}
-            onReset={onResetSMToken}
+            {...baseSecretInputProps('smToken')}
           />
         </Field>
 
         <Field label="Oncall Url" description="" className={s.marginTop}>
           <Input
             width={60}
-            name="oncallUrl"
-            id="config-oncall-url"
-            value={state.oncallUrl}
             placeholder={`E.g.: https://my-oncall-instance.com`}
-            onChange={onChange}
+            {...baseInputProps('oncallUrl')}
           />
         </Field>
 
         <Field label="Oncall Token" description="">
           <SecretInput
-            width={60}
-            id="config-oncall-token"
-            name="oncallToken"
-            value={state.oncallToken}
             placeholder={'Your oncall token'}
-            onChange={onChange}
-            isConfigured={state.isOnCallTokenSet}
-            onReset={onResetOncallToken}
+            {...baseSecretInputProps('oncallToken')}
           />
         </Field>
 
         <Field label="Cloud Org" description="" className={s.marginTop}>
           <Input
             width={60}
-            name="cloudOrg"
-            id="config-cloud-org"
-            value={state.cloudOrg}
             placeholder={`E.g.: my-cloud-org`}
-            onChange={onChange}
+            {...baseInputProps('cloudOrg')}
           />
         </Field>
 
         <Field label="Cloud Access Policy Token" description="">
           <SecretInput
-            width={60}
-            id="config-cloud-access-policy-token"
-            name="cloudAccessPolicyToken"
-            value={state.cloudAccessPolicyToken}
-            isConfigured={state.isCloudAccessPolicyTokenSet}
             placeholder={'Access policy token'}
-            onChange={onChange}
-            onReset={onResetAccessPolicyToken}
+            {...baseSecretInputProps('cloudAccessPolicyToken')}
           />
         </Field>
 
@@ -206,33 +168,13 @@ export const AppConfig = ({ plugin }: AppConfigProps) => {
           <Button
             type="submit"
             onClick={() => {
-              const secureJsonData: KeyValue<string> = {};
-              if (!state.isServiceAccountTokenSet) {
-                secureJsonData.serviceAccountToken = state.serviceAccountToken;
-              }
-              if (!state.isCloudAccessPolicyTokenSet) {
-                secureJsonData.cloudAccessPolicyToken = state.cloudAccessPolicyToken;
-              }
-              if (!state.isSMTokenSet) {
-                secureJsonData.smToken = state.smToken;
-              }
-              if (!state.isOnCallTokenSet) {
-                secureJsonData.oncallToken = state.oncallToken;
-              }
-
               return updatePluginAndReload(plugin.meta.id, {
                 enabled,
                 pinned,
-                jsonData: {
-                  grafanaUrl: state.grafanaUrl,
-                  cloudOrg: state.cloudOrg,
-                  grafanaIsCloudStack: state.grafanaIsCloudStack,
-                  smUrl: state.smUrl,
-                  oncallUrl: state.oncallUrl,
-                },
+                jsonData: state.jsonData,
                 // This cannot be queried later by the frontend.
                 // We don't want to override it in case it was set previously and left untouched now.
-                secureJsonData: secureJsonData,
+                secureJsonData: state.secureJsonData,
               })
             }
             }
@@ -254,7 +196,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
   `,
 });
 
-const updatePluginAndReload = async (pluginId: string, data: Partial<PluginMeta<AppPluginSettings>>) => {
+const updatePluginAndReload = async (pluginId: string, data: Partial<PluginMeta<ExporterPluginMetaJSONData>>) => {
   try {
     await updatePlugin(pluginId, data);
 
