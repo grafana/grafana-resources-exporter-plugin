@@ -22,11 +22,12 @@
         "import\\s*.*\".*?\""
     ],
     "words": [
-        "grafana",
+        "crossplane",
         "datasource",
         "datasources",
-        "crossplane",
+        "grafana",
         "oncall",
-        "resourcesexporter"
+        "resourcesexporter",
+        "serviceaccounts"
     ]
 }

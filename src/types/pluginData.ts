@@ -7,6 +7,7 @@ export type ExporterPluginMetaJSONData = {
     smUrl: string;
     oncallUrl: string;
     cloudOrg: string;
+    initialized: boolean;
 };
 
 export type ExporterPluginMetaSecureJSONData = {
