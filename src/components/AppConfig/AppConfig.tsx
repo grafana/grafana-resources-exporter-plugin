@@ -3,7 +3,7 @@ import { lastValueFrom } from 'rxjs';
 import { css } from '@emotion/css';
 import { GrafanaTheme2, KeyValue, PluginMeta } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
-import { Button, Checkbox, Field, FieldSet, Input, SecretInput, useStyles2 } from '@grafana/ui';
+import { Button, Field, FieldSet, Input, SecretInput, useStyles2 } from '@grafana/ui';
 import { ExporterPluginConfigPageProps, ExporterPluginMetaJSONData, ExporterPluginMetaSecureJSONData } from 'types/pluginData';
 
 
@@ -16,15 +16,18 @@ type State = {
 interface Props extends ExporterPluginConfigPageProps { }
 
 export const AppConfig = ({ plugin }: Props) => {
+  const currentHost = window.location.protocol + '//' + window.location.host;
+
   const s = useStyles2(getStyles);
   const { enabled, pinned, jsonData, secureJsonFields } = plugin.meta;
   const [state, setState] = useState<State>({
     jsonData: jsonData || {
-      grafanaUrl: '',
+      grafanaUrl: currentHost,
       grafanaIsCloudStack: false,
       smUrl: '',
       oncallUrl: '',
       cloudOrg: '',
+      initialized: false,
     },
     secureJsonData: {
       grafanaServiceAccountToken: '',
@@ -34,6 +37,11 @@ export const AppConfig = ({ plugin }: Props) => {
     },
     secureJsonDataSet: secureJsonFields || {},
   });
+
+  const serviceAccountURL = state.jsonData.grafanaUrl + '/org/serviceaccounts';
+  const smURL = state.jsonData.grafanaUrl + '/a/grafana-synthetic-monitoring-app/config';
+  const oncallURL = state.jsonData.grafanaUrl + '/a/grafana-oncall-app/settings';
+
 
   function baseInputProps<T>(key: keyof ExporterPluginMetaJSONData) {
     return {
@@ -93,33 +101,33 @@ export const AppConfig = ({ plugin }: Props) => {
             width={60}
             placeholder={`E.g.: https://my-grafana-instance.com`}
             {...baseInputProps('grafanaUrl')}
+            addonAfter={
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setState({
+                    ...state,
+                    jsonData: {
+                      ...state.jsonData,
+                      grafanaUrl: currentHost,
+                    },
+                  });
+                }}
+              >
+                Reset
+              </Button>
+            }
           />
         </Field>
 
-        <Field label="Is Cloud Stack" description="Is this a cloud stack?">
-          <Checkbox label="Is Cloud Stack"
-            name="grafanaIsCloudStack"
-            checked={state.jsonData.grafanaIsCloudStack}
-            onChange={(event) => {
-              setState({
-                ...state,
-                jsonData: {
-                  ...state.jsonData,
-                  grafanaIsCloudStack: event.currentTarget.checked,
-                },
-              });
-            }}
-          />
-        </Field>
-
-        <Field label="Service Account Token" description="A service account token.">
+        <Field label="Service Account Token" description={<a rel="noreferrer" target='_blank' href={serviceAccountURL}>Create one here: {serviceAccountURL}</a>}>
           <SecretInput
             placeholder={'Your service account token'}
             {...baseSecretInputProps('grafanaServiceAccountToken')}
           />
         </Field>
 
-        <Field label="SM Url" description="" className={s.marginTop}>
+        <Field label="SM Url" description={<a rel="noreferrer" target='_blank' href={smURL}>Find it here: {smURL}</a>} className={s.marginTop}>
           <Input
             width={60}
             placeholder={`E.g.: https://my-sm-instance.com`}
@@ -127,14 +135,14 @@ export const AppConfig = ({ plugin }: Props) => {
           />
         </Field>
 
-        <Field label="SM Token" description="">
+        <Field label="SM Token" description={<a rel="noreferrer" target='_blank' href={smURL}>Create one here: {smURL}</a>}>
           <SecretInput
             placeholder={'Your SM token'}
             {...baseSecretInputProps('smToken')}
           />
         </Field>
 
-        <Field label="Oncall Url" description="" className={s.marginTop}>
+        <Field label="Oncall Url" description={<a rel="noreferrer" target='_blank' href={oncallURL}>Find it here: {oncallURL}</a>} className={s.marginTop}>
           <Input
             width={60}
             placeholder={`E.g.: https://my-oncall-instance.com`}
@@ -142,7 +150,7 @@ export const AppConfig = ({ plugin }: Props) => {
           />
         </Field>
 
-        <Field label="Oncall Token" description="">
+        <Field label="Oncall Token" description={<a rel="noreferrer" target='_blank' href={oncallURL}>Create one here: {oncallURL}</a>}>
           <SecretInput
             placeholder={'Your oncall token'}
             {...baseSecretInputProps('oncallToken')}
@@ -171,7 +179,15 @@ export const AppConfig = ({ plugin }: Props) => {
               return updatePluginAndReload(plugin.meta.id, {
                 enabled,
                 pinned,
-                jsonData: state.jsonData,
+                jsonData: {
+                  ...state.jsonData,
+                  initialized: true,
+                  // TODO: This doesn't work for custom stack URLs. Find a better way.
+                  grafanaIsCloudStack:
+                    state.jsonData.grafanaUrl.includes('.grafana.net') ||
+                    state.jsonData.grafanaUrl.includes('.grafana-dev.net') ||
+                    state.jsonData.grafanaUrl.includes('.grafana-ops.net'),
+                },
                 // This cannot be queried later by the frontend.
                 // We don't want to override it in case it was set previously and left untouched now.
                 secureJsonData: state.secureJsonData,
