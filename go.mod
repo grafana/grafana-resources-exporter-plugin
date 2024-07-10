@@ -10,7 +10,7 @@ replace github.com/hashicorp/terraform-exec v0.21.0 => github.com/hrmsk66/terraf
 require (
 	github.com/grafana/grafana-plugin-sdk-go v0.236.0
 	github.com/grafana/grizzly v0.4.4
-	github.com/grafana/terraform-provider-grafana/v3 v3.2.1
+	github.com/grafana/terraform-provider-grafana/v3 v3.3.1-0.20240710125908-ae20cce50e98
 )
 
 require (
@@ -59,13 +59,13 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
-	github.com/grafana/amixr-api-go-client v0.0.12-0.20240410110211-c9f68db085c4 // indirect
+	github.com/grafana/amixr-api-go-client v0.0.12 // indirect
 	github.com/grafana/grafana-com-public-clients/go/gcom v0.0.0-20240322153219-42c6a1d2bcab // indirect
 	github.com/grafana/grafana-openapi-client-go v0.0.0-20240523010106-657d101fcbd9 // indirect
 	github.com/grafana/machine-learning-go-client v0.7.0 // indirect
 	github.com/grafana/otel-profiling-go v0.5.1 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.7 // indirect
-	github.com/grafana/slo-openapi-client/go v0.0.0-20240507015908-bf9e85638f2f // indirect
+	github.com/grafana/slo-openapi-client/go v0.0.0-20240626093634-e6741482b090 // indirect
 	github.com/grafana/synthetic-monitoring-agent v0.24.3 // indirect
 	github.com/grafana/synthetic-monitoring-api-go-client v0.8.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.1 // indirect
@@ -180,7 +180,7 @@ require (
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240415180920-8c6c420018be // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be // indirect
-	google.golang.org/grpc v1.64.0 // indirect
+	google.golang.org/grpc v1.64.1 // indirect
 	google.golang.org/protobuf v1.34.0 // indirect
 	gopkg.in/fsnotify.v1 v1.4.7 // indirect
 	gopkg.in/fsnotify/fsnotify.v1 v1.4.7 // indirect

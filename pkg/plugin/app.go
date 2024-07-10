@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
@@ -74,8 +75,9 @@ func (config *Config) FromAppInstanceSettings(settings backend.AppInstanceSettin
 type App struct {
 	backend.CallResourceHandler
 
-	config *Config
-	logger log.Logger
+	config       *Config
+	logger       log.Logger
+	tfInstallDir string // Keep the terraform binarie in a consistent temp dir. This avoids the need to download it every time, increasing significantly the performance.
 }
 
 // NewApp creates a new example *App instance.
@@ -83,6 +85,10 @@ func NewApp(_ context.Context, appInstanceSettings backend.AppInstanceSettings) 
 	app := App{
 		config: &Config{},
 		logger: log.New(),
+	}
+	var err error
+	if app.tfInstallDir, err = os.MkdirTemp("", "tfexec"); err != nil {
+		return nil, err
 	}
 
 	if err := app.config.FromAppInstanceSettings(appInstanceSettings); err != nil {
@@ -102,7 +108,7 @@ func NewApp(_ context.Context, appInstanceSettings backend.AppInstanceSettings) 
 // Dispose here tells plugin SDK that plugin wants to clean up resources when a new instance
 // created.
 func (a *App) Dispose() {
-	// cleanup
+	os.RemoveAll(a.tfInstallDir)
 }
 
 // CheckHealth handles health checks sent from Grafana to the plugin.

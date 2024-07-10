@@ -80,6 +80,9 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 		}
 	} else {
 		genConfig := &tfgenerate.Config{
+			TerraformInstallConfig: tfgenerate.TerraformInstallConfig{
+				InstallDir: a.tfInstallDir,
+			},
 			OutputDir:        tmpDir,
 			Clobber:          true,
 			ProviderVersion:  "v3.0.0", // TODO(kgz): can we get that from the tf provider itself?
