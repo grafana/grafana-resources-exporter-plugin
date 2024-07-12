@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PluginPage, getBackendSrv, isFetchError } from '@grafana/runtime';
-import { Alert, ErrorWithStack, ToolbarButton, ToolbarButtonRow } from '@grafana/ui';
+import { Alert, ErrorWithStack, LoadingPlaceholder, ToolbarButton, ToolbarButtonRow } from '@grafana/ui';
 import { GeneratedFile, GenerateRequest, GenerateResponse } from "../types/generator";
 import { saveAs } from 'file-saver';
 import JSZip from "jszip";
@@ -48,7 +48,7 @@ export function ExportPage() {
   } else if (files.length > 0) {
     content = <ResultViewer height={editorHeight + 'px'} files={files} />
   } else if (loading) {
-    content = <div>Loading...</div>
+    content = <LoadingPlaceholder text="Loading..." />
   }
 
   const generate = async () => {
