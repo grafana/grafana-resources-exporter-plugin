@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { css } from '@emotion/css';
-import { GrafanaTheme2 } from '@grafana/data';
 import { PluginPage, getBackendSrv, isFetchError } from '@grafana/runtime';
-import { useStyles2, ErrorWithStack, Spinner, Button } from '@grafana/ui';
+import { ErrorWithStack, ToolbarButton, ToolbarButtonRow } from '@grafana/ui';
 import { GeneratedFile, GenerateRequest, GenerateResponse } from "../types/generator";
 import { saveAs } from 'file-saver';
 import JSZip from "jszip";
@@ -11,8 +9,6 @@ import { ResultViewer } from '../components/ResultViewer'
 import { OptionsSelector } from 'components/OptionsSelector';
 
 export function ExportPage() {
-  const s = useStyles2(getStyles);
-
   const [files, setFiles] = useState<GeneratedFile[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<{ title: string, error: Error, info: React.ErrorInfo | null } | undefined>(undefined)
@@ -42,26 +38,24 @@ export function ExportPage() {
     window.addEventListener('resize', reloadEditorHeight);
   }, [resizeRegistered])
 
-  let content: React.ReactNode
+  let content: React.ReactNode = <div>
+    <p>Use the `Generate` button above to render all Grafana resources as Terraform, Crossplane or Grizzly files.</p>
+  </div>
 
   if (error) {
     content = <ErrorWithStack title={error.title} error={error.error} errorInfo={error.info} />;
-  } else if (loading) {
-    content = <Spinner size={"xxl"} className={s.marginTop} />;
-  } else if (files?.length === 0) {
-    content = <div className={s.marginTop}>
-      <p>Resources within Grafana can be represented in other formats.</p>
-      <p>Use the `Generate` button above to render all Grafana resources as Terraform, Crossplane or Grizzly files.</p>
-      <p>Once you have generated your resources, you can download them all as a zip file.</p>
-    </div>
-  } else {
+  } else if (files.length > 0) {
     content = <ResultViewer height={editorHeight + 'px'} files={files} />
+  } else if (loading) {
+    content = <div>Loading...</div>
   }
+
   const generate = async () => {
     setLoading(true)
     try {
       const exports = await getBackendSrv().post<GenerateResponse>(`api/plugins/${pluginJson.id}/resources/generate`, options, { showErrorAlert: false });
       setFiles(exports.files || [{ name: "Result", content: "No resources were found" }])
+      setError(undefined)
     } catch (err) {
       if (err instanceof Error) {
         setError({ title: err.message, error: err, info: null })
@@ -89,31 +83,22 @@ export function ExportPage() {
       saveAs(content, "grafana-terraform-export.zip");
     });
   };
+
+  const actions = <ToolbarButtonRow>
+    <ToolbarButton icon="cog" tooltip={optionsCollapsed ? 'Show Options' : 'Hide Options'} variant="canvas" disabled={loading} onClick={_ => {
+      setOptionsCollapsed(!optionsCollapsed);
+      reloadEditorHeight();
+    }}>{optionsCollapsed ? 'Show Options' : 'Hide Options'}</ToolbarButton>
+    <ToolbarButton icon="file-download" tooltip='Download as zip' variant="canvas" disabled={files.length === 0 || error !== undefined || loading} onClick={_ => download()}>Download as zip</ToolbarButton>
+    <ToolbarButton icon={loading ? 'spinner' : 'sync'} tooltip="Generate" variant='primary' disabled={loading} onClick={_ => { setOptionsCollapsed(true); generate(); reloadEditorHeight(); }}>Generate</ToolbarButton>
+  </ToolbarButtonRow >
+
   return (
-    <PluginPage>
-      <div ref={topRef}>
-        <OptionsSelector onChange={setOptions} className={optionsCollapsed ? s.displayNone : ""} />
-        <Button icon="arrow-to-right" onClick={_ => { setOptionsCollapsed(true); generate(); reloadEditorHeight(); }} disabled={options === undefined}>Generate</Button>
-        <Button className={s.marginLeft} icon="file-download" disabled={files.length === 0} onClick={_ => download()}>Download as zip</Button>
-        <Button className={s.marginLeft} icon={optionsCollapsed ? "angle-double-down" : "angle-double-up"} onClick={_ => { setOptionsCollapsed(!optionsCollapsed); }}>{optionsCollapsed ? "Show options" : "Hide options"}</Button>
+    <PluginPage actions={actions}>
+      <div ref={topRef} style={optionsCollapsed ? { display: 'none' } : {}}>
+        <OptionsSelector onChange={setOptions} />
       </div>
       {content}
     </PluginPage >
   );
 }
-
-const getStyles = (theme: GrafanaTheme2) => ({
-  displayNone: css`
-      display: none;
-      `,
-  marginTop: css`
-      margin-top: ${theme.spacing(2)};
-      `,
-  marginLeft: css`
-      margin-left: ${theme.spacing(2)};
-      `,
-  margin: css`
-      margin-left: ${theme.spacing(2)};
-      margin-right: ${theme.spacing(2)};
-      `,
-});

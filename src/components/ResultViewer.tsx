@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useStyles2, Tab, TabsBar, TabContent, CodeEditor } from '@grafana/ui'
-import { css } from '@emotion/css';
-import { GrafanaTheme2 } from '@grafana/data';
+import { Tab, TabsBar, TabContent, CodeEditor } from '@grafana/ui'
 import { GeneratedFile } from '../types/generator'
 
 interface ResultViewerProps {
@@ -25,7 +23,6 @@ const fileToLanguage = (file: string): string => {
 }
 
 export const ResultViewer = (props: ResultViewerProps) => {
-  const s = useStyles2(getStyles);
   const [tabsHeight, setTabsHeight] = useState(0)
   const tabsRef = useRef(null)
 
@@ -37,7 +34,7 @@ export const ResultViewer = (props: ResultViewerProps) => {
 
   const [activeTab, setActiveTab] = useState(0)
   return (
-    <div className={s.marginTop}>
+    <div>
       <TabsBar ref={tabsRef}>
         {props.files.map((file, i) => (<Tab key={i} active={i === activeTab} label={file.name} onChangeTab={_ => { setActiveTab(i) }} />))}
       </TabsBar>
@@ -55,9 +52,3 @@ export const ResultViewer = (props: ResultViewerProps) => {
     </div>
   );
 }
-
-const getStyles = (theme: GrafanaTheme2) => ({
-  marginTop: css`
-      margin-top: ${theme.spacing(2)};
-    `,
-});

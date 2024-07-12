@@ -14,7 +14,6 @@ const targetOptions = [
 
 interface OptionsSelectorProps {
   onChange: React.Dispatch<React.SetStateAction<GenerateRequest | undefined>>
-  className?: string
 }
 
 export function OptionsSelector(props: OptionsSelectorProps) {
@@ -58,7 +57,7 @@ export function OptionsSelector(props: OptionsSelectorProps) {
   }, [props, target, format, resourceTypes]);
 
   return (
-    <div className={props.className}>
+    <div>
       <Field label="Target">
         <RadioButtonGroup options={targetOptions} value={target} onChange={v => setTarget(v!)} size="md" />
       </Field>
