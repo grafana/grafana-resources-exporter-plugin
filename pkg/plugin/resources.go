@@ -2,6 +2,8 @@ package plugin
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/fs"
 	"net/http"
 	"os"
@@ -36,7 +38,8 @@ type generatedFile struct {
 }
 
 type generateResponse struct {
-	Files []generatedFile `json:"files"`
+	Files    []generatedFile `json:"files"`
+	Warnings []string        `json:"warnings"`
 }
 
 func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
@@ -70,6 +73,7 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 		}
 	}()
 
+	var errStrings []string
 	if strings.HasPrefix(body.OutputFormat, "grizzly") {
 		registry := a.grizzlyRegistry()
 		eventsRecorder := grizzly.NewWriterRecorder(os.Stderr, grizzly.EventToPlainText)
@@ -112,9 +116,19 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 			}
 		}
 
-		if err := tfgenerate.Generate(req.Context(), genConfig); err != nil {
-			a.logger.Error(err.Error())
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		result := tfgenerate.Generate(req.Context(), genConfig)
+		criticalErr := false
+		for _, err := range result.Errors {
+			a.logger.Error(fmt.Sprintf("error %s (%T)", err.Error(), err))
+			// ResourceErrors are not critical. Only end the request if there are other errors.
+			if _, ok := err.(tfgenerate.ResourceError); !ok {
+				criticalErr = true
+				break
+			}
+			errStrings = append(errStrings, err.Error())
+		}
+		if criticalErr {
+			http.Error(w, errors.Join(result.Errors...).Error(), http.StatusInternalServerError)
 			return
 		}
 	}
@@ -127,7 +141,8 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 	}
 
 	resp := generateResponse{
-		Files: files,
+		Files:    files,
+		Warnings: errStrings,
 	}
 
 	w.Header().Add("Content-Type", "application/json")
