@@ -986,10 +986,10 @@
     ua-parser-js "^1.0.32"
     web-vitals "^4.0.1"
 
-"@grafana/plugin-meta-extractor@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@grafana/plugin-meta-extractor/-/plugin-meta-extractor-0.0.3.tgz#9f0aaac808762f6d0a824422d90f3eaaca4152e0"
-  integrity sha512-jnLggwZEWTkMr2QJVjsPuZek2geDTjyWDRqBnFGYFQd3Gyc3I3V/kc13rbyIXvD/DteCc/6CuZQYz9T8QHcjVA==
+"@grafana/plugin-meta-extractor@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@grafana/plugin-meta-extractor/-/plugin-meta-extractor-0.0.4.tgz#bac896022a58103856868976002268398b34e5d2"
+  integrity sha512-k7+aBUyrRufYvpEqLey1VLKIIwpsqoR//gajHh1NOzk4MiS/3A8WhrOXBUKsG0A+Yf+9rhO9C41Te6h+49pbmQ==
   dependencies:
     debug "^4.3.4"
     typescript "^5.4.5"
