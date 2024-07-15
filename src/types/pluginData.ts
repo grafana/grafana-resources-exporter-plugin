@@ -11,10 +11,10 @@ export type ExporterPluginMetaJSONData = {
 };
 
 export type ExporterPluginMetaSecureJSONData = {
-    grafanaServiceAccountToken: string;
-    smToken: string;
-    oncallToken: string;
-    cloudAccessPolicyToken: string;
+    grafanaServiceAccountToken?: string;
+    smToken?: string;
+    oncallToken?: string;
+    cloudAccessPolicyToken?: string;
 };
 
 export type AppRootProps = BaseAppRootProps<ExporterPluginMetaJSONData>;

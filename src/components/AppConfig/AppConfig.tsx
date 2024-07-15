@@ -29,11 +29,13 @@ export const AppConfig = ({ plugin }: Props) => {
       cloudOrg: '',
       initialized: false,
     },
+    // Fields that were set previously should be set to undefined to avoid wiping them out.
+    // Undefined fields will be omitted from the payload sent to the backend, so they won't be updated.
     secureJsonData: {
-      grafanaServiceAccountToken: '',
-      smToken: '',
-      oncallToken: '',
-      cloudAccessPolicyToken: '',
+      grafanaServiceAccountToken: !secureJsonFields?.grafanaServiceAccountToken ? '' : undefined,
+      smToken: !secureJsonFields?.smToken ? '' : undefined,
+      oncallToken: !secureJsonFields?.oncallToken ? '' : undefined,
+      cloudAccessPolicyToken: !secureJsonFields?.cloudAccessPolicyToken ? '' : undefined,
     },
     secureJsonDataSet: secureJsonFields || {},
   });
