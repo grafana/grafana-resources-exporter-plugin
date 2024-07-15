@@ -3,7 +3,7 @@ import { lastValueFrom } from 'rxjs';
 import { css } from '@emotion/css';
 import { GrafanaTheme2, KeyValue, PluginMeta } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
-import { Button, Field, FieldSet, Input, SecretInput, useStyles2 } from '@grafana/ui';
+import { Button, Field, FieldSet, Input, SecretInput, Tab, TabContent, TabsBar, useStyles2 } from '@grafana/ui';
 import { ExporterPluginConfigPageProps, ExporterPluginMetaJSONData, ExporterPluginMetaSecureJSONData } from 'types/pluginData';
 
 
@@ -37,6 +37,12 @@ export const AppConfig = ({ plugin }: Props) => {
     },
     secureJsonDataSet: secureJsonFields || {},
   });
+  const [tabs, setTabs] = useState([
+    { label: 'Grafana', active: true },
+    { label: 'Synthetic Monitoring', active: false },
+    { label: 'OnCall', active: false },
+    { label: 'Cloud', active: false },
+  ]);
 
   const serviceAccountURL = state.jsonData.grafanaUrl + '/org/serviceaccounts';
   const smURL = state.jsonData.grafanaUrl + '/a/grafana-synthetic-monitoring-app/config';
@@ -92,85 +98,99 @@ export const AppConfig = ({ plugin }: Props) => {
     };
   }
 
-
+  const linkButton = (url: string, text: string) => <Button variant="secondary" onClick={() => window.open(url, '_blank')}>{text}</Button>;
   return (
     <div>
       <FieldSet label="API Settings">
-        <Field label="Grafana Url" description="" className={s.marginTop}>
-          <Input
-            width={60}
-            placeholder={`E.g.: https://my-grafana-instance.com`}
-            {...baseInputProps('grafanaUrl')}
-            addonAfter={
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  setState({
-                    ...state,
-                    jsonData: {
-                      ...state.jsonData,
-                      grafanaUrl: currentHost,
-                    },
-                  });
-                }}
-              >
-                Reset
-              </Button>
-            }
-          />
-        </Field>
+        <TabsBar>
+          {tabs.map((tab, index) => {
+            return <Tab key={index} label={tab.label} active={tab.active} onChangeTab={() => setTabs(tabs.map((tab, idx) => ({
+              ...tab,
+              active: idx === index
+            })))} />;
+          })}
+        </TabsBar>
+        <TabContent>
+          {tabs[0].active && <>
+            <Field label="Grafana Url" className={s.marginTop}>
+              <Input
+                width={60}
+                placeholder={`E.g.: https://my-grafana-instance.com`}
+                {...baseInputProps('grafanaUrl')}
+                addonAfter={
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setState({
+                        ...state,
+                        jsonData: {
+                          ...state.jsonData,
+                          grafanaUrl: currentHost,
+                        },
+                      });
+                    }}
+                  >
+                    Reset
+                  </Button>
+                }
+              />
+            </Field>
 
-        <Field label="Service Account Token" description={<a rel="noreferrer" target='_blank' href={serviceAccountURL}>Create one here: {serviceAccountURL}</a>}>
-          <SecretInput
-            placeholder={'Your service account token'}
-            {...baseSecretInputProps('grafanaServiceAccountToken')}
-          />
-        </Field>
+            <Field label="Service Account Token">
+              <SecretInput
+                placeholder={'Your service account token'}
+                {...baseSecretInputProps('grafanaServiceAccountToken')}
+                addonAfter={!state.secureJsonDataSet['grafanaServiceAccountToken'] ? linkButton(serviceAccountURL, "Create") : <></>}
+              />
+            </Field>
+          </>}
+          {tabs[1].active && <>
+            <Field label="SM Url" className={s.marginTop}>
+              <Input
+                width={60}
+                {...baseInputProps('smUrl')}
+                addonAfter={linkButton(smURL, "Get from SM")}
+              />
+            </Field>
 
-        <Field label="SM Url" description={<a rel="noreferrer" target='_blank' href={smURL}>Find it here: {smURL}</a>} className={s.marginTop}>
-          <Input
-            width={60}
-            placeholder={`E.g.: https://my-sm-instance.com`}
-            {...baseInputProps('smUrl')}
-          />
-        </Field>
+            <Field label="SM Token">
+              <SecretInput
+                {...baseSecretInputProps('smToken')}
+                addonAfter={!state.secureJsonDataSet['smToken'] ? linkButton(smURL, "Get from SM") : <></>}
+              />
+            </Field>
+          </>}
+          {tabs[2].active && <>
+            <Field label="Oncall Url" className={s.marginTop}>
+              <Input
+                width={60}
+                {...baseInputProps('oncallUrl')}
+                addonAfter={linkButton(oncallURL, "Get from Oncall")}
+              />
+            </Field>
 
-        <Field label="SM Token" description={<a rel="noreferrer" target='_blank' href={smURL}>Create one here: {smURL}</a>}>
-          <SecretInput
-            placeholder={'Your SM token'}
-            {...baseSecretInputProps('smToken')}
-          />
-        </Field>
+            <Field label="Oncall Token">
+              <SecretInput
+                {...baseSecretInputProps('oncallToken')}
+                addonAfter={!state.secureJsonDataSet['oncallToken'] ? linkButton(oncallURL, "Get from Oncall") : <></>}
+              />
+            </Field>
+          </>}
+          {tabs[3].active && <>
+            <Field label="Cloud Org" className={s.marginTop}>
+              <Input
+                width={60}
+                {...baseInputProps('cloudOrg')}
+              />
+            </Field>
 
-        <Field label="Oncall Url" description={<a rel="noreferrer" target='_blank' href={oncallURL}>Find it here: {oncallURL}</a>} className={s.marginTop}>
-          <Input
-            width={60}
-            placeholder={`E.g.: https://my-oncall-instance.com`}
-            {...baseInputProps('oncallUrl')}
-          />
-        </Field>
-
-        <Field label="Oncall Token" description={<a rel="noreferrer" target='_blank' href={oncallURL}>Create one here: {oncallURL}</a>}>
-          <SecretInput
-            placeholder={'Your oncall token'}
-            {...baseSecretInputProps('oncallToken')}
-          />
-        </Field>
-
-        <Field label="Cloud Org" description="" className={s.marginTop}>
-          <Input
-            width={60}
-            placeholder={`E.g.: my-cloud-org`}
-            {...baseInputProps('cloudOrg')}
-          />
-        </Field>
-
-        <Field label="Cloud Access Policy Token" description="">
-          <SecretInput
-            placeholder={'Access policy token'}
-            {...baseSecretInputProps('cloudAccessPolicyToken')}
-          />
-        </Field>
+            <Field label="Cloud Access Policy Token">
+              <SecretInput
+                {...baseSecretInputProps('cloudAccessPolicyToken')}
+              />
+            </Field>
+          </>}
+        </TabContent>
 
         <div className={s.marginTop}>
           <Button
