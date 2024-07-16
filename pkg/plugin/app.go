@@ -127,8 +127,8 @@ func (a *App) grizzlyRegistry() grizzly.Registry {
 	providers := []grizzly.Provider{grafanaProvider}
 	if a.config.SecureJSONData.SMToken != "" {
 		providers = append(providers, grizzlySM.NewProvider(&grizzlyConfig.SyntheticMonitoringConfig{
-			URL:   a.config.JSONData.SMURL,
-			Token: a.config.SecureJSONData.SMToken,
+			URL:         a.config.JSONData.SMURL,
+			AccessToken: a.config.SecureJSONData.SMToken,
 		}))
 	}
 	return grizzly.NewRegistry(providers)
