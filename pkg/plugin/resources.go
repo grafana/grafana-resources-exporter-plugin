@@ -39,7 +39,7 @@ type generatedFile struct {
 
 type generateResponse struct {
 	Files    []generatedFile `json:"files"`
-	Warnings []string        `json:"warnings"`
+	Warnings []string        `json:"warnings,omitempty"`
 }
 
 func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {

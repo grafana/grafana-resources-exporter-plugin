@@ -11,5 +11,5 @@ export interface GenerateRequest {
 
 export interface GenerateResponse {
     files: GeneratedFile[];
-    warnings: string[];
+    warnings?: string[];
 }

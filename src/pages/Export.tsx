@@ -56,7 +56,7 @@ export function ExportPage() {
     try {
       const exports = await getBackendSrv().post<GenerateResponse>(`api/plugins/${pluginJson.id}/resources/generate`, options, { showErrorAlert: false });
       setFiles(exports.files || [{ name: "Result", content: "No resources were found" }])
-      if (exports.warnings.length > 0) {
+      if (exports.warnings && exports.warnings.length > 0) {
         setWarning({ title: "Some resources could not be exported", error: new Error(exports.warnings.join('\n')) })
       }
       setError(undefined)
