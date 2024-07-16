@@ -120,8 +120,8 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 		criticalErr := false
 		for _, err := range result.Errors {
 			a.logger.Error(fmt.Sprintf("error %s (%T)", err.Error(), err))
-			// ResourceErrors are not critical. Only end the request if there are other errors.
-			if _, ok := err.(tfgenerate.ResourceError); !ok {
+			// Only end the request if there are critical errors.
+			if _, ok := err.(tfgenerate.NonCriticalError); !ok {
 				criticalErr = true
 				break
 			}
