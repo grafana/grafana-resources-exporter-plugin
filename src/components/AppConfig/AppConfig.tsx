@@ -114,7 +114,7 @@ export const AppConfig = ({ plugin }: Props) => {
         </TabsBar>
         <TabContent>
           {tabs[0].active && <>
-            <Field label="Grafana Url" className={s.marginTop}>
+            <Field label="Grafana URL" className={s.marginTop}>
               <Input
                 width={60}
                 placeholder={`E.g.: https://my-grafana-instance.com`}
@@ -138,16 +138,15 @@ export const AppConfig = ({ plugin }: Props) => {
               />
             </Field>
 
-            <Field label="Service Account Token">
+            <Field label="Grafana Authentication" description="A service account token or a username:password pair (Only for on-prem Grafana)">
               <SecretInput
-                label="A service account token or a username:password pair (Only for on-prem Grafana)"
                 {...baseSecretInputProps('grafanaAuth')}
                 addonAfter={!state.secureJsonDataSet['grafanaAuth'] ? linkButton(serviceAccountURL, "Create") : <></>}
               />
             </Field>
           </>}
           {tabs[1].active && <>
-            <Field label="SM Url" className={s.marginTop}>
+            <Field label="SM URL" className={s.marginTop}>
               <Input
                 width={60}
                 {...baseInputProps('smUrl')}
@@ -163,7 +162,7 @@ export const AppConfig = ({ plugin }: Props) => {
             </Field>
           </>}
           {tabs[2].active && <>
-            <Field label="Oncall Url" className={s.marginTop}>
+            <Field label="OnCall URL" className={s.marginTop}>
               <Input
                 width={60}
                 {...baseInputProps('oncallUrl')}
