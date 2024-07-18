@@ -35,7 +35,7 @@ type JSONData struct {
 }
 
 type EncodedSecureJSONData struct {
-	ServiceAccountToken    string `json:"grafanaServiceAccountToken"`
+	GrafanaAuth            string `json:"grafanaAuth"`
 	SMToken                string `json:"smToken"`
 	OnCallToken            string `json:"oncallToken"`
 	CloudAccessPolicyToken string `json:"cloudAccessPolicyToken"`
@@ -54,8 +54,8 @@ func (config *Config) FromAppInstanceSettings(settings backend.AppInstanceSettin
 	}
 
 	if settings.DecryptedSecureJSONData != nil {
-		if saToken, ok := settings.DecryptedSecureJSONData["grafanaServiceAccountToken"]; ok {
-			config.SecureJSONData.ServiceAccountToken = saToken
+		if auth, ok := settings.DecryptedSecureJSONData["grafanaAuth"]; ok {
+			config.SecureJSONData.GrafanaAuth = auth
 		}
 		if capToken, ok := settings.DecryptedSecureJSONData["cloudAccessPolicyToken"]; ok {
 			config.SecureJSONData.CloudAccessPolicyToken = capToken
@@ -122,7 +122,7 @@ func (a *App) CheckHealth(_ context.Context, _ *backend.CheckHealthRequest) (*ba
 func (a *App) grizzlyRegistry() grizzly.Registry {
 	grafanaProvider := grizzlyGrafana.NewProvider(&grizzlyConfig.GrafanaConfig{
 		URL:   a.config.JSONData.GrafanaURL,
-		Token: a.config.SecureJSONData.ServiceAccountToken,
+		Token: a.config.SecureJSONData.GrafanaAuth,
 	})
 	providers := []grizzly.Provider{grafanaProvider}
 	if a.config.SecureJSONData.SMToken != "" {

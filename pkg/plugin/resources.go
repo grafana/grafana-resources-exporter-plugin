@@ -101,7 +101,7 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 		} else {
 			genConfig.Grafana = &tfgenerate.GrafanaConfig{
 				URL:  a.config.JSONData.GrafanaURL,
-				Auth: a.config.SecureJSONData.ServiceAccountToken,
+				Auth: a.config.SecureJSONData.GrafanaAuth,
 			}
 			if a.config.SecureJSONData.SMToken != "" {
 				genConfig.Grafana.SMURL = a.config.JSONData.SMURL
@@ -214,6 +214,13 @@ func (a *App) handleResourceTypes(w http.ResponseWriter, req *http.Request) {
 				case "Cloud":
 					continue
 				default:
+					if !strings.Contains(a.config.SecureJSONData.GrafanaAuth, ":") {
+						// Skip global resources, they only work with basic auth
+						switch r.Name {
+						case "grafana_organization", "grafana_organization_preferences", "grafana_user":
+							continue
+						}
+					}
 					resources = append(resources, resource{Name: r.Name, Category: string(r.Category)})
 				}
 			}
