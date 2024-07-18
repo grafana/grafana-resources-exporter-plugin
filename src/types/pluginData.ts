@@ -11,7 +11,7 @@ export type ExporterPluginMetaJSONData = {
 };
 
 export type ExporterPluginMetaSecureJSONData = {
-    grafanaServiceAccountToken?: string;
+    grafanaAuth?: string;
     smToken?: string;
     oncallToken?: string;
     cloudAccessPolicyToken?: string;

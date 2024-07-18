@@ -32,7 +32,7 @@ export const AppConfig = ({ plugin }: Props) => {
     // Fields that were set previously should be set to undefined to avoid wiping them out.
     // Undefined fields will be omitted from the payload sent to the backend, so they won't be updated.
     secureJsonData: {
-      grafanaServiceAccountToken: !secureJsonFields?.grafanaServiceAccountToken ? '' : undefined,
+      grafanaAuth: !secureJsonFields?.grafanaAuth ? '' : undefined,
       smToken: !secureJsonFields?.smToken ? '' : undefined,
       oncallToken: !secureJsonFields?.oncallToken ? '' : undefined,
       cloudAccessPolicyToken: !secureJsonFields?.cloudAccessPolicyToken ? '' : undefined,
@@ -140,9 +140,9 @@ export const AppConfig = ({ plugin }: Props) => {
 
             <Field label="Service Account Token">
               <SecretInput
-                placeholder={'Your service account token'}
-                {...baseSecretInputProps('grafanaServiceAccountToken')}
-                addonAfter={!state.secureJsonDataSet['grafanaServiceAccountToken'] ? linkButton(serviceAccountURL, "Create") : <></>}
+                label="A service account token or a username:password pair (Only for on-prem Grafana)"
+                {...baseSecretInputProps('grafanaAuth')}
+                addonAfter={!state.secureJsonDataSet['grafanaAuth'] ? linkButton(serviceAccountURL, "Create") : <></>}
               />
             </Field>
           </>}
