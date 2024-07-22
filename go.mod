@@ -10,7 +10,7 @@ replace github.com/hashicorp/terraform-exec v0.21.0 => github.com/hrmsk66/terraf
 require (
 	github.com/grafana/grafana-plugin-sdk-go v0.240.0
 	github.com/grafana/grizzly v0.4.5-0.20240716190114-d54b3c83f2a4
-	github.com/grafana/terraform-provider-grafana/v3 v3.4.1-0.20240718183848-66c9b0530b4d
+	github.com/grafana/terraform-provider-grafana/v3 v3.5.0
 	github.com/stretchr/testify v1.9.0
 )
 
