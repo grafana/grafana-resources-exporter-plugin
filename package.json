@@ -1,6 +1,6 @@
 {
   "name": "grafana-resources-exporter-app",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Export resources from your instance or Grafana Cloud account as Terraform, Grizzly or Crossplane resource definitions.",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
