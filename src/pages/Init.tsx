@@ -1,18 +1,11 @@
 import { PluginPage } from "@grafana/runtime";
 import { Button } from "@grafana/ui";
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { AppRootProps } from "types/pluginData";
 
 export const InitPage = (plugin: AppRootProps) => {
     const navigate = useNavigate();
-
-    useEffect(() => {
-        if (plugin.meta !== undefined && plugin.meta.jsonData && plugin.meta.jsonData.initialized === true) {
-            navigate('export');
-        }
-    }, [navigate, plugin.meta]);
-
     return (
         <PluginPage>
             <div>
