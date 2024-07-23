@@ -89,7 +89,7 @@ func (a *App) handleGenerate(w http.ResponseWriter, req *http.Request) {
 			},
 			OutputDir:        tmpDir,
 			Clobber:          true,
-			ProviderVersion:  "v3.0.0", // TODO(kgz): can we get that from the tf provider itself?
+			ProviderVersion:  ">=3.0",
 			Format:           tfgenerate.OutputFormat(strings.TrimPrefix(body.OutputFormat, "terraform-")),
 			IncludeResources: body.OnlyResources,
 		}
