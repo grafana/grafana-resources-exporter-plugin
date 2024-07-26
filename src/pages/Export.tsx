@@ -53,6 +53,7 @@ export function ExportPage() {
 
   const generate = async () => {
     setLoading(true)
+    setWarning(undefined)
     try {
       const exports = await getBackendSrv().post<GenerateResponse>(`api/plugins/${pluginJson.id}/resources/generate`, options, { showErrorAlert: false });
       setFiles(exports.files || [{ name: "Result", content: "No resources were found" }])
