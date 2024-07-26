@@ -10,7 +10,7 @@ replace github.com/hashicorp/terraform-exec v0.21.0 => github.com/hrmsk66/terraf
 require (
 	github.com/grafana/grafana-plugin-sdk-go v0.240.0
 	github.com/grafana/grizzly v0.4.5-0.20240716190114-d54b3c83f2a4
-	github.com/grafana/terraform-provider-grafana/v3 v3.5.0
+	github.com/grafana/terraform-provider-grafana/v3 v3.6.0
 	github.com/stretchr/testify v1.9.0
 )
 
@@ -63,7 +63,7 @@ require (
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/grafana/amixr-api-go-client v0.0.12 // indirect
 	github.com/grafana/grafana-com-public-clients/go/gcom v0.0.0-20240322153219-42c6a1d2bcab // indirect
-	github.com/grafana/grafana-openapi-client-go v0.0.0-20240523010106-657d101fcbd9 // indirect
+	github.com/grafana/grafana-openapi-client-go v0.0.0-20240723170622-ae2c94b7c9a3 // indirect
 	github.com/grafana/machine-learning-go-client v0.8.0 // indirect
 	github.com/grafana/otel-profiling-go v0.5.1 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.7 // indirect
