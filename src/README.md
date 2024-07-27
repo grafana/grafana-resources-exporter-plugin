@@ -2,9 +2,33 @@
 
 The resources exporter is a Grafana App Plugin that allows users to export resources from their instance or Grafana Cloud account as Terraform, Grizzly or Crossplane resource definitions.
 
+## Terraform Config Generation
+
+The plugin generates three Terraform [Grafana provider](https://registry.terraform.io/providers/grafana/grafana/latest) files:
+
+* `provider.tf`: This file contains the `terraform {}` block that installs the provider as well as the `provider "grafana"` block that configures the Grafana provider.
+* `resources.tf`: The Grafana provider resources that were generated.
+* `imports.tf`: `import {}` blocks that map the Grafana resources with their unique identifier.
+
+These files can be downloaded and used right away, after putting credentials in the `provider.tf` file. 
+
+When a `terraform plan` is run on the files, Terraform should show no changes, only imported resources. On a `terraform apply`, the resources will be added to the state and the `import {}` blocks can be removed.
+
+## Grizzly Resources
+
+Generates resources in the [Grizzly format](https://github.com/grafana/grizzly)
+
+The plugin pulls resources the same way that the `grr pull` command does. The files can be applied with the `grr apply` command.
+
+## Crossplane Resources
+
+Generates resources for the Crossplane [Grafana provider](https://marketplace.upbound.io/providers/grafana/provider-grafana)
+
+After writing the secret that is referred in the `provider.yaml` file, the resources can be applied in a Kubernetes cluster with the Grafana provider installed, though it may be best to rework the resources into compositions.
+
 ## Maturity
 
-> _The code in this folder should be considered experimental. Documentation is only
+> _The code in this plugin should be considered experimental. Documentation is only
 available alongside the code. It comes with no support, but we are keen to receive
 feedback on the product and suggestions on how to improve it, though we cannot commit
 to resolution of any particular issue. No SLAs are available. It is not meant to be used
