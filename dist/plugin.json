@@ -1,0 +1,63 @@
+{
+    "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
+    "type": "app",
+    "name": "Resources Exporter",
+    "id": "grafana-resourcesexporter-app",
+    "backend": true,
+    "preload": true,
+    "executable": "gpx_grafana_resources_exporter_plugin",
+    "info": {
+        "keywords": [
+            "app",
+            "terraform",
+            "crossplane",
+            "grizzly",
+            "as-code",
+            "export"
+        ],
+        "description": "Export resources from your instance or Grafana Cloud account as Terraform, Grizzly or Crossplane resource definitions.",
+        "author": {
+            "name": "Grafana Labs",
+            "url": "https://grafana.com"
+        },
+        "logos": {
+            "small": "img/logo.svg",
+            "large": "img/logo.svg"
+        },
+        "screenshots": [],
+        "version": "0.1.0",
+        "updated": "2024-07-27"
+    },
+    "includes": [
+        {
+            "type": "page",
+            "name": "Start",
+            "path": "/a/grafana-resourcesexporter-app/",
+            "role": "Editor",
+            "addToNav": true,
+            "defaultNav": true
+        },
+        {
+            "type": "page",
+            "icon": "cog",
+            "name": "Configuration",
+            "path": "/plugins/grafana-resourcesexporter-app",
+            "role": "Admin",
+            "addToNav": true
+        }
+    ],
+    "iam": {
+        "permissions": [
+            {
+                "action": "viewer"
+            }
+        ]
+    },
+    "dependencies": {
+        "grafanaDependency": ">=10.3.3",
+        "plugins": []
+    },
+    "generated": {
+        "extensions": []
+    }
+}
