@@ -42,16 +42,26 @@ export function ResourceTypeSelector(props: ResourceTypeSelectorProps) {
     </div>
     <div className={s.resourceTypeCheckbox}>
       {
-        Object.keys(grouped).sort().map((category: string) =>
-          <div key={category} className={s.row}>
-            {Object.keys(grouped).length > 1 && <div className={s.category}>{category}</div>}
+        Object.keys(grouped).sort().map((category: string) => {
+          const totalCount = grouped[category].length;
+          const selectedCount = grouped[category].filter((type: ResourceType) => type.selected).length;
+
+          return <div key={category} className={s.row}>
+            {Object.keys(grouped).length > 1 && <div className={s.category}>
+              <Checkbox label={category} indeterminate={selectedCount > 0 && selectedCount < totalCount} checked={selectedCount == totalCount} onChange={(e) => {
+                const newState = selectedCount < totalCount;
+                grouped[category].forEach((type: ResourceType) => type.selected = newState);
+                props.onChange([...props.resourceTypes]);
+              }} />
+            </div>}
             <div className={s.resourceTypes}>
               {grouped[category].map((type: ResourceType, i: number) => {
                 return <Checkbox className={s.checkbox} key={type.name} checked={type.selected} label={type.name} onChange={(e) => { updateResourceTypes(type.name) }} />
               })}
             </div>
             <br />
-          </div>
+          </div>;
+        }
         )
       }
     </div>
