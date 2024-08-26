@@ -7,8 +7,9 @@ import JSZip from "jszip";
 import pluginJson from '../plugin.json'
 import { ResultViewer } from '../components/ResultViewer'
 import { OptionsSelector } from 'components/OptionsSelector';
+import { AppRootProps } from 'types/pluginData';
 
-export function ExportPage() {
+export function ExportPage(props: AppRootProps) {
   const [files, setFiles] = useState<GeneratedFile[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<{ title: string, error: Error } | undefined>(undefined)
@@ -106,7 +107,7 @@ export function ExportPage() {
         </Alert>
       }
       <div ref={topRef} style={optionsCollapsed ? { display: 'none' } : {}}>
-        <OptionsSelector onChange={setOptions} />
+        <OptionsSelector cloudEnabled={Boolean(props.meta.jsonData?.cloudOrg && props.meta.secureJsonFields?.cloudAccessPolicyToken)} onChange={setOptions} />
       </div>
       {content}
     </PluginPage >

@@ -7,13 +7,11 @@ import { ResourceType } from '../types/resourceTypes'
 import { GenerateRequest } from 'types/generator';
 import { css } from '@emotion/css';
 
-const targetOptions = [
-  { label: 'This Grafana instance', value: 'grafana' },
-  { label: 'Grafana Cloud', value: 'cloud' },
-];
+
 
 interface OptionsSelectorProps {
   onChange: React.Dispatch<React.SetStateAction<GenerateRequest | undefined>>
+  cloudEnabled: boolean
 }
 
 export function OptionsSelector(props: OptionsSelectorProps) {
@@ -23,6 +21,11 @@ export function OptionsSelector(props: OptionsSelectorProps) {
   const [outputFormatOptions, setOutputFormatOptions] = useState<SelectableValue[]>([])
   const [resourceTypes, setResourceTypes] = useState<ResourceType[]>([])
   const [error, setError] = useState<string>("")
+
+  const targetOptions: Array<SelectableValue<string>> = [
+    { label: 'This Grafana instance', value: 'grafana' },
+    { label: 'Grafana Cloud', value: 'cloud', isDisabled: !props.cloudEnabled, description: props.cloudEnabled ? '' : 'Not configured' },
+  ];
 
   // Only terraform and crossplane formats are supported for Cloud
   useEffect(() => {
@@ -59,7 +62,7 @@ export function OptionsSelector(props: OptionsSelectorProps) {
   return (
     <div>
       <Field label="Target">
-        <RadioButtonGroup options={targetOptions} value={target} onChange={v => setTarget(v!)} size="md" />
+        <RadioButtonGroup options={targetOptions} disabledOptions={targetOptions.filter(o => o.isDisabled).map(o => o.value)} value={target} onChange={v => setTarget(v!)} size="md" />
       </Field>
       <Field label="Output format">
         <RadioButtonGroup options={outputFormatOptions} value={format} onChange={v => setFormat(v!)} size="md" />
