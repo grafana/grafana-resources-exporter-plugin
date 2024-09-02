@@ -8,7 +8,7 @@ toolchain go1.22.3
 replace github.com/hashicorp/terraform-exec v0.21.0 => github.com/hrmsk66/terraform-exec v0.21.0
 
 require (
-	github.com/grafana/grafana-plugin-sdk-go v0.244.0
+	github.com/grafana/grafana-plugin-sdk-go v0.245.0
 	github.com/grafana/grizzly v0.4.5
 	github.com/grafana/terraform-provider-grafana/v3 v3.7.0
 	github.com/stretchr/testify v1.9.0
