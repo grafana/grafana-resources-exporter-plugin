@@ -1,15 +1,14 @@
 module github.com/grafana/grafana-resources-exporter-plugin
 
 go 1.22
-
-toolchain go1.22.3
+toolchain go1.23.1
 
 // see https://github.com/grafana/terraform-provider-grafana/pull/1592#discussion_r1618609696
 replace github.com/hashicorp/terraform-exec v0.21.0 => github.com/hrmsk66/terraform-exec v0.21.0
 
 require (
 	github.com/grafana/grafana-plugin-sdk-go v0.244.0
-	github.com/grafana/grizzly v0.4.5
+	github.com/grafana/grizzly v0.4.7
 	github.com/grafana/terraform-provider-grafana/v3 v3.7.0
 	github.com/stretchr/testify v1.9.0
 )
