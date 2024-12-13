@@ -11,7 +11,7 @@ require (
 	github.com/grafana/grafana-plugin-sdk-go v0.244.0
 	github.com/grafana/grizzly v0.4.5
 	github.com/grafana/terraform-provider-grafana/v3 v3.7.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 )
 
 require (
