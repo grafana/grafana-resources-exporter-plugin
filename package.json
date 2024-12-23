@@ -24,7 +24,7 @@
     "@playwright/test": "^1.46.0",
     "@swc/core": "^1.7.42",
     "@swc/helpers": "^0.5.15",
-    "@swc/jest": "^0.2.26",
+    "@swc/jest": "^0.2.37",
     "@testing-library/jest-dom": "6.4.8",
     "@testing-library/react": "16.1.0",
     "@types/file-saver": "^2.0.7",
