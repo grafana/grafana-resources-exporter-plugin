@@ -2,7 +2,7 @@ module github.com/grafana/grafana-resources-exporter-plugin
 
 go 1.24.0
 
-toolchain go1.24.9
+toolchain go1.26.2
 
 // see https://github.com/grafana/terraform-provider-grafana/pull/1592#discussion_r1618609696
 replace github.com/hashicorp/terraform-exec v0.21.0 => github.com/hrmsk66/terraform-exec v0.21.0
