@@ -1,5 +1,8 @@
 # Grafana Resources Exporter
 
+> [!NOTE]
+> This project has been archived and is no longer actively developed. The ideas behind it are slowly being incorporated into Grafana natively.
+
 The resources exporter is a Grafana App Plugin that allows users to export resources from their instance or Grafana Cloud account as Terraform, Grizzly or Crossplane resource definitions.
 
 ## Terraform Config Generation
